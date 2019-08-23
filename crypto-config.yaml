@@ -1,0 +1,18 @@
+
+OrdererOrgs:
+  - Name: Orderer
+    Domain: blockfiler.com
+    Specs:
+      - Hostname: orderer
+        SANS:
+          - "localhost"
+          - "127.0.0.1"
+
+PeerOrgs:
+  - Name: Blockfiler
+    Domain: blockfiler.com
+    EnableNodeOUs: true
+    Template:
+      Count: 1
+    Users:
+      Count: 0

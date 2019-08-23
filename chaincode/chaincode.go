@@ -1,0 +1,78 @@
+package main
+
+/* Imports
+ * 4 utility libraries for formatting, handling bytes, reading and writing JSON, and string manipulation
+ * 2 specific Hyperledger Fabric specific libraries for Smart Contracts
+ */
+import (
+	
+	"encoding/json"
+	"fmt"
+	
+	"github.com/hyperledger/fabric/core/chaincode/shim"
+	sc "github.com/hyperledger/fabric/protos/peer"
+)
+
+// Define the Smart Contract structure
+type SmartContract struct {
+}
+
+type Bet struct {
+	User string `json:"user"`
+	Number string `json:"number"`
+}
+
+func (s *SmartContract) Init(APIstub shim.ChaincodeStubInterface) sc.Response {
+	return shim.Success(nil)
+}
+
+func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response {
+
+	// Retrieve the requested Smart Contract function and arguments
+	function, args := APIstub.GetFunctionAndParameters()
+	// Route to the appropriate handler function to interact with the ledger appropriately
+	
+	if function == "createTx" {
+		return s.createTx(APIstub, args)
+	} else if function == "query" {
+		return s.query(APIstub, args)
+	}  
+
+	return shim.Error("Invalid Smart Contract function name.")
+}
+
+func (s *SmartContract) createTx(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+	var err error
+	
+	fmt.Println("number ", args[0])
+
+	keyAsBytes, _ := json.Marshal(args[0])
+	fmt.Println("keyAsBytes ", keyAsBytes)
+
+	err = APIstub.PutState("number", keyAsBytes)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
+}
+
+func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+
+	QueryAsBytes, _ := APIstub.GetState(args[0])
+	return shim.Success(QueryAsBytes)
+}
+
+// The main function is only relevant in unit test mode. Only included here for completeness.
+func main() {
+
+	// Create a new Smart Contract
+	err := shim.Start(new(SmartContract))
+	if err != nil {
+		fmt.Printf("Error creating new Smart Contract: %s", err)
+	}
+}
