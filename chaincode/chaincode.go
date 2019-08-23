@@ -5,10 +5,9 @@ package main
  * 2 specific Hyperledger Fabric specific libraries for Smart Contracts
  */
 import (
-	
 	"encoding/json"
 	"fmt"
-	
+
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
@@ -17,9 +16,9 @@ import (
 type SmartContract struct {
 }
 
-type Bet struct {
-	User string `json:"user"`
-	Number string `json:"number"`
+type Register struct {
+	Key     string `json:"key"`
+	Content string `json:"content"`
 }
 
 func (s *SmartContract) Init(APIstub shim.ChaincodeStubInterface) sc.Response {
@@ -31,25 +30,25 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 	// Retrieve the requested Smart Contract function and arguments
 	function, args := APIstub.GetFunctionAndParameters()
 	// Route to the appropriate handler function to interact with the ledger appropriately
-	
+
 	if function == "createTx" {
 		return s.createTx(APIstub, args)
 	} else if function == "query" {
 		return s.query(APIstub, args)
-	}  
+	}
 
 	return shim.Error("Invalid Smart Contract function name.")
 }
 
 func (s *SmartContract) createTx(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 	var err error
-	
-	fmt.Println("number ", args[0])
+
+	fmt.Println("content ", args[0])
 
 	keyAsBytes, _ := json.Marshal(args[0])
 	fmt.Println("keyAsBytes ", keyAsBytes)
 
-	err = APIstub.PutState("number", keyAsBytes)
+	err = APIstub.PutState("content", keyAsBytes)
 	if err != nil {
 		return shim.Error(err.Error())
 	}

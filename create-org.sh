@@ -24,9 +24,9 @@ docker-compose -f docker-compose.yml down
 
 docker-compose -p network -f docker-compose.yml up -d 
 
-export FABRIC_START_TIMEOUT=2
+#export FABRIC_START_TIMEOUT=2
 
-sleep ${FABRIC_START_TIMEOUT}
+sleep 2
 
 # --tls --cafile /opt/peer/crypto/ordererOrganizations/${ORGANIZATION_NAME2}/tlsca/tlsca.${ORGANIZATION_NAME2}-cert.pem
 # Create the channel
@@ -35,7 +35,7 @@ docker exec cli.${ORGANIZATION_NAME2} peer channel create -o orderer.${ORGANIZAT
 # Join peer0.${ORGANIZATION_NAME2} to the channel.
 docker exec cli.${ORGANIZATION_NAME2} peer channel join -b mychannel.block 
 
-sleep ${FABRIC_START_TIMEOUT}
+sleep 2
 
 docker exec cli.${ORGANIZATION_NAME2} peer chaincode install -n chaincode -v 1.0 -p github.com/chaincode -l golang
 
@@ -43,6 +43,6 @@ docker exec cli.${ORGANIZATION_NAME2} peer chaincode instantiate -o orderer.${OR
 
 #Enroll admins and register users to interact with the network
 node ./scripts/enrollAdmin.js
-sleep 1
+sleep 2
 node ./scripts/registerUser.js
-sleep 1
+sleep 2

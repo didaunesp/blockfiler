@@ -12,7 +12,7 @@ exports.createTx = function (request, response) {
 	var fabric_client = new Fabric_Client();
 
 	// setup the fabric network
-	var channel = fabric_client.newChannel("diplomachannel");
+	var channel = fabric_client.newChannel("mychannel");
 	var peer = fabric_client.newPeer('grpc://localhost:7051');
 	channel.addPeer(peer);
 	var order = fabric_client.newOrderer('grpc://localhost:7050')
@@ -20,23 +20,16 @@ exports.createTx = function (request, response) {
 
 
 	var member_user = null;
-	var store_path = path.join(__dirname, './users/certificates/org1');
+	var store_path = path.join(__dirname, '/users');
 	console.log('Store path:'+store_path);
 	var tx_id = null;
 
-	var collection = request.body.collection;
-	var key = request.body.universidade.universityId;
-	console.log("JSON universityId", collection, key);
 	var jsonPayload = request.body;
 
-	var	UniversityName = request.body.universidade.universityName.toString();
-	var	DiplomaId = request.body.diploma.diplomaId;
-	var	StudentName = request.body.diploma.aluno.studentName.toString();
-	var	CourseName = request.body.diploma.curso.courseName;
-	var	EndDate =	request.body.diploma.curso.endDate;
-	var	StudentCpf = request.body.diploma.aluno.studentCpf.toString();
+	var	Key = request.body.key.toString();
+	var	Content = request.body.content.toString();
 
-	console.log("parameters ", key, UniversityName, DiplomaId, StudentName, CourseName, EndDate, StudentCpf)
+	console.log("parameters ", Key, Content)
 
 	// create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
 	Fabric_Client.newDefaultKeyValueStore({ path: store_path
@@ -51,13 +44,13 @@ exports.createTx = function (request, response) {
 		fabric_client.setCryptoSuite(crypto_suite);
 
 		// get the enrolled user from persistence, this user will sign all requests
-		return fabric_client.getUserContext('userOrg1', true);
+		return fabric_client.getUserContext('user1', true);
 	}).then((user_from_store) => {
 		if (user_from_store && user_from_store.isEnrolled()) {
-			console.log('Successfully loaded userOrg1 from persistence');
+			console.log('Successfully loaded use from persistence');
 			member_user = user_from_store;
 		} else {
-			throw new Error('Failed to get userOrg1.... run registerUser.js');
+			throw new Error('Failed to get user.... run registerUser.js');
 		}
 		console.log("loaded config file");
 		// get a transaction id object based on the current user assigned to fabric client
@@ -67,20 +60,21 @@ exports.createTx = function (request, response) {
 		// createCar chaincode function - requires 5 args, ex: args: ['CAR12', 'Honda', 'Accord', 'Black', 'Tom'],
 		// changeCarOwner chaincode function - requires 2 args , ex: args: ['CAR10', 'Dave'],
 		// must send the proposal to endorsing peers
-		var diplomaTransaction = {jsonPayload};
-		console.log("DIPLOMA TRANSACTION ", JSON.stringify(diplomaTransaction));
+		var filerTransaction = {jsonPayload};
+		console.log("FILER TRANSACTION ", JSON.stringify(filerTransaction));
 		var request = {
 			//targets: let default to the peer assigned to the client
-			chaincodeId: 'diploma',
-			fcn: 'criarDiploma',
-			args: [JSON.stringify(diplomaTransaction), collection, key, key, UniversityName, DiplomaId, StudentName, CourseName, EndDate, StudentCpf],
-			chainId: 'diplomachannel',
+			chaincodeId: 'chaincode',
+			fcn: 'createTx',
+			args: [JSON.stringify(filerTransaction), Content, Key],
+			chainId: 'mychannel',
 			txId: tx_id
 		};
 
 		// send the transaction proposal to the peers
 		return channel.sendTransactionProposal(request);
 	}).then((results) => {
+		console.log(results);
 		var proposalResponses = results[0];
 		var proposal = results[1];
 		let isProposalGood = false;
@@ -90,6 +84,7 @@ exports.createTx = function (request, response) {
 				console.log('Transaction proposal was good');
 			} else {
 				console.error('Transaction proposal was bad');
+				console.error('Proposal Response: '+proposalResponses[0].response.status);
 			}
 		if (isProposalGood) {
 			console.log(util.format(
@@ -159,16 +154,21 @@ exports.createTx = function (request, response) {
 		// check the results in the order the promises were added to the promise all list
 		if (results && results[0] && results[0].status === 'SUCCESS') {
 			console.log('Successfully sent transaction to the orderer.');
+			return {"erro":false,"response":"ok"};
 		} else {
 			console.error('Failed to order the transaction. Error code: ' + results[0].status);
+			return {"erro":true,"response":"o'Failed to order the transaction. Error code: ' + results[0].status"};
 		}
-
+;;
 		if(results && results[1] && results[1].event_status === 'VALID') {
 			console.log('Successfully committed the change to the ledger by the peer');
+			return {"erro":false,"response":"ok"}; 
 		} else {
 			console.log('Transaction failed to be committed to the ledger due to ::'+results[1].event_status);
+			return {"erro":true,"response":'Transaction failed to be committed to the ledger due to ::'+results[1].event_status}; 
 		}
 	}).catch((err) => {
 		console.error('Failed to invoke successfully :: ' + err);
+		return {"erro":true,"response":err}; 
 	});
 }
