@@ -1,2 +1,7 @@
 
 scripts/node_modules/*
+
+node-express/node_modules/*
+node-express/package-lock.json
+
+scripts/package-lock.json
