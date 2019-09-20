@@ -5,3 +5,7 @@ node-express/node_modules/*
 node-express/package-lock.json
 
 scripts/package-lock.json
+blockfiler.com/*
+scripts/users/*
+crypto-config/*
+config/*
