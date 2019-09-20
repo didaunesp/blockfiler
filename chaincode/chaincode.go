@@ -44,11 +44,12 @@ func (s *SmartContract) createTx(APIstub shim.ChaincodeStubInterface, args []str
 	var err error
 
 	fmt.Println("content ", args[0])
+	var key = args[0]
 
-	keyAsBytes, _ := json.Marshal(args[0])
+	keyAsBytes, _ := json.Marshal(args[1])
 	fmt.Println("keyAsBytes ", keyAsBytes)
 
-	err = APIstub.PutState("content", keyAsBytes)
+	err = APIstub.PutState(key, keyAsBytes)
 	if err != nil {
 		return shim.Error(err.Error())
 	}

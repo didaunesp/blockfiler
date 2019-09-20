@@ -141,7 +141,7 @@ Orderer: &OrdererDefaults
     OrdererType: solo
 
     Addresses:
-        - orderer.com:7050
+        - orderer.blockfiler.com:7050
 
     # Batch Timeout: The amount of time to wait before creating a batch
     BatchTimeout: 2s

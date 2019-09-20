@@ -2,7 +2,7 @@
 
 exports.createTx = function (request, response) {
 
-	var diploma = request.body;
+	var blockfiler = request.body;
 
 	var Fabric_Client = require('fabric-client');
 	var path = require('path');
@@ -26,10 +26,10 @@ exports.createTx = function (request, response) {
 
 	var jsonPayload = request.body;
 
-	var	Key = request.body.key.toString();
-	var	Content = request.body.content.toString();
+	var	key = blockfiler.key.toString();
+	var	content = blockfiler.content.toString();
 
-	console.log("parameters ", Key, Content)
+	console.log("parameters ", key, content)
 
 	// create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
 	Fabric_Client.newDefaultKeyValueStore({ path: store_path
@@ -44,13 +44,13 @@ exports.createTx = function (request, response) {
 		fabric_client.setCryptoSuite(crypto_suite);
 
 		// get the enrolled user from persistence, this user will sign all requests
-		return fabric_client.getUserContext('user1', true);
+		return fabric_client.getUserContext('nick2', true);
 	}).then((user_from_store) => {
 		if (user_from_store && user_from_store.isEnrolled()) {
 			console.log('Successfully loaded use from persistence');
 			member_user = user_from_store;
 		} else {
-			throw new Error('Failed to get user.... run registerUser.js');
+			throw new Error('Failed to get nick2.... run registerUser.js');
 		}
 		console.log("loaded config file");
 		// get a transaction id object based on the current user assigned to fabric client
@@ -66,7 +66,7 @@ exports.createTx = function (request, response) {
 			//targets: let default to the peer assigned to the client
 			chaincodeId: 'chaincode',
 			fcn: 'createTx',
-			args: [JSON.stringify(filerTransaction), Content, Key],
+			args: [key, content],
 			chainId: 'mychannel',
 			txId: tx_id
 		};
@@ -154,21 +154,13 @@ exports.createTx = function (request, response) {
 		// check the results in the order the promises were added to the promise all list
 		if (results && results[0] && results[0].status === 'SUCCESS') {
 			console.log('Successfully sent transaction to the orderer.');
-			return {"erro":false,"response":"ok"};
+			response.end("{\"erro\":false,\"response\":\"ok\"}");
 		} else {
 			console.error('Failed to order the transaction. Error code: ' + results[0].status);
-			return {"erro":true,"response":"o'Failed to order the transaction. Error code: ' + results[0].status"};
-		}
-;;
-		if(results && results[1] && results[1].event_status === 'VALID') {
-			console.log('Successfully committed the change to the ledger by the peer');
-			return {"erro":false,"response":"ok"}; 
-		} else {
-			console.log('Transaction failed to be committed to the ledger due to ::'+results[1].event_status);
-			return {"erro":true,"response":'Transaction failed to be committed to the ledger due to ::'+results[1].event_status}; 
+			response.end("{\"erro\":true,\"response\":\"o'Failed to order the transaction. Error code:" + results[0].status+"\"}");
 		}
 	}).catch((err) => {
 		console.error('Failed to invoke successfully :: ' + err);
-		return {"erro":true,"response":err}; 
+		response.end("{\"erro\":true,\"response\":err}");
 	});
 }

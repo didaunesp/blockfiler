@@ -17,14 +17,12 @@ exports.queryTx = function (request, response) {
 
 	//
 	var member_user = null;
-	var store_path = path.join(__dirname, './users/');
+	var store_path = path.join(__dirname, './users');
 	console.log('Store path:'+store_path);
 	var tx_id = null;
 
 	var jsonKey = request.body.key;
 	console.log("KEY ", jsonKey);
-	var jsonCollection = request.body.collection;
-	console.log("COLLECTION ", jsonCollection);
 
 	// create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
 	Fabric_Client.newDefaultKeyValueStore({ path: store_path
@@ -39,22 +37,22 @@ exports.queryTx = function (request, response) {
 		fabric_client.setCryptoSuite(crypto_suite);
 
 		// get the enrolled user from persistence, this user will sign all requests
-		return fabric_client.getUserContext('user1', true);
+		return fabric_client.getUserContext('nick2', true);
 	}).then((user_from_store) => {
 		if (user_from_store && user_from_store.isEnrolled()) {
-			console.log('Successfully loaded user1 from persistence');
+			console.log('Successfully loaded nick2 from persistence');
 			member_user = user_from_store;
 		} else {
-			throw new Error('Failed to get user1.... run registerUser.js');
+			throw new Error('Failed to get nick2.... run registerUser.js');
 		}
 
 		// queryCar chaincode function - requires 1 argument, ex: args: ['CAR4'],
 		// queryAllCars chaincode function - requires no arguments , ex: args: [''],
 		const request = {
 			//targets : --- letting this default to the peers assigned to the channel
-			chaincodeId: 'diploma',
-			fcn: 'queryDiploma',
-			args: [jsonKey, jsonCollection]
+			chaincodeId: 'chaincode',
+			fcn: 'query',
+			args: [jsonKey]
 		};
 
 		// send the query proposal to the peer
@@ -66,7 +64,15 @@ exports.queryTx = function (request, response) {
 			if (query_responses[0] instanceof Error) {
 				console.error("error from query = ", query_responses[0]);
 			} else {
-				console.log("Response is ", query_responses[0].toString());
+				var transactionResponse = query_responses[0].toString();
+				transactionResponse = transactionResponse.replace("[\"", "[");
+				transactionResponse = transactionResponse.replace("}\"]", "}]");
+				transactionResponse = transactionResponse.replace(/\\/g, "");
+				transactionResponse = transactionResponse.replace(/]}}","{"header/g , "]}}, {\"header");
+				transactionResponse = transactionResponse.replace(/]}}","{"body/g , "]}}, {\"body");
+				transactionResponse = transactionResponse.replace(/]}}","{"transactionId/g , "]}}, {\"transactionId");
+				console.log("Response is ", transactionResponse);
+				response.end("{\"content\": "+transactionResponse+"}");
 			}
 		} else {
 			console.log("No payloads were returned from query");
