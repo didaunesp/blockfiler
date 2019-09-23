@@ -31,8 +31,8 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 	function, args := APIstub.GetFunctionAndParameters()
 	// Route to the appropriate handler function to interact with the ledger appropriately
 
-	if function == "createTx" {
-		return s.createTx(APIstub, args)
+	if function == "create" {
+		return s.create(APIstub, args)
 	} else if function == "query" {
 		return s.query(APIstub, args)
 	} else if function == "history" {
@@ -42,7 +42,7 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 	return shim.Error("Invalid Smart Contract function name.")
 }
 
-func (s *SmartContract) createTx(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+func (s *SmartContract) create(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 	var err error
 
 	fmt.Println("content ", args[0])

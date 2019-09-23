@@ -66,7 +66,7 @@ exports.createUser = function (request, response) {
 		var request = {
 			//targets: let default to the peer assigned to the client
 			chaincodeId: 'chaincode',
-			fcn: 'createTx',
+			fcn: 'create',
 			args: [key, content],
 			chainId: 'mychannel',
 			txId: tx_id
