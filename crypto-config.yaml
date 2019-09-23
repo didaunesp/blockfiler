@@ -24,3 +24,12 @@ PeerOrgs:
       Count: 1
     Users:
       Count: 0
+
+  - Name: Blockfiler3
+    Domain: blockfiler3.com
+    EnableNodeOUs: true
+    Template:
+      Count: 1
+    Users:
+      Count: 0
+

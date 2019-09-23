@@ -7,6 +7,7 @@ node-express/package-lock.json
 scripts/package-lock.json
 blockfiler.com/*
 blockfiler2.com/*
+blockfiler3.com/*
 scripts/users/*
 crypto-config/*
 config/*

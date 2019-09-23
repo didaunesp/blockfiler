@@ -46,3 +46,10 @@ if [ "$?" -ne 0 ]; then
   echo "Failed to generate anchor peer update for Blockfiler2MSP..."
   exit 1
 fi
+
+# generate anchor peer org 3 transaction
+configtxgen -profile Channel -outputAnchorPeersUpdate ./config/Org3MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Blockfiler3MSP
+if [ "$?" -ne 0 ]; then
+  echo "Failed to generate anchor peer update for Blockfiler3MSP..."
+  exit 1
+fi
