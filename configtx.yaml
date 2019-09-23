@@ -86,7 +86,7 @@ Organizations:
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
             - Host: peer0.blockfiler2.com
-              Port: 8051
+              Port: 7051
 
 Capabilities:
     # Channel capabilities apply to both the orderers and the peers and must be
