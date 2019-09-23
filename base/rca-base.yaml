@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  rca-base:
+    image: hyperledger/fabric-ca:1.4.1
+    command: sh -c 'fabric-ca-server start -d -b admin:adminpw --port 7054 --cfg.identities.allowremove'
+    environment:
+      - FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca
+      - FABRIC_CA_SERVER_CLIENT=/etc/hyperledger/fabric-ca-client
+      - FABRIC_CA_CLIENT_TLS_CERTFILES=/etc/hyperledger/fabric-ca/tls-cert.pem
+      - FABRIC_CA_SERVER_TLS_ENABLED=false
+      - FABRIC_CA_SERVER_DEBUG=true
+
+
+
+

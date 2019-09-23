@@ -65,13 +65,22 @@ docker exec cli.${ORGANIZATION2_NAME2} peer channel -c ${CHANNEL_NAME} update -o
 #update org3 anchor peer
 docker exec cli.${ORGANIZATION3_NAME2} peer channel -c ${CHANNEL_NAME} update -o orderer.${ORGANIZATION_NAME2}:7050 -f /etc/hyperledger/configtx/Org3MSPanchors.tx
 
+sleep 2
 
-#install chaincode on peer
+#install chaincode on peer 1
 docker exec cli.${ORGANIZATION_NAME2} peer chaincode install -n chaincode -v 1.0 -p github.com/chaincode -l golang
 
 sleep 2
 
-#instantiate chaincode on peer
+#install chaincode on peer 2
+docker exec cli.${ORGANIZATION2_NAME2} peer chaincode install -n chaincode -v 1.0 -p github.com/chaincode -l golang
+
+sleep 2
+
+#install chaincode on peer 3
+docker exec cli.${ORGANIZATION3_NAME2} peer chaincode install -n chaincode -v 1.0 -p github.com/chaincode -l golang
+
+sleep 2
+
+#instantiate chaincode on peer 1
 docker exec cli.${ORGANIZATION_NAME2} peer chaincode instantiate -o orderer.${ORGANIZATION_NAME2}:7050 -C ${CHANNEL_NAME} -n chaincode -l golang -v 1.0 -c '{"Args":[]}' -P "OR('BlockfilerMSP.member')" 
-
-

@@ -1,0 +1,20 @@
+version: '2'
+
+services:
+  cli-base:
+    image: hyperledger/fabric-tools
+    tty: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - FABRIC_LOGGING_SPEC=debug
+      - CORE_CHAINCODE_KEEPALIVE=10
+    working_dir: /opt/peer
+    command: /bin/bash
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../chaincode/:/opt/gopath/src/github.com/chaincode
+      - ../crypto-config/:/opt/peer/crypto/
+      - ../config:/etc/hyperledger/configtx
+    networks:
+      - network
