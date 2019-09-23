@@ -92,6 +92,7 @@ services:
       - 7053:7053
     volumes:
         - /var/run/:/host/var/run/
+        - ./mychannel-block:/etc/hyperledger/msp/peer/mychannel-block
         - ./crypto-config/peerOrganizations/${COMPANY_DOMAIN}/peers/peer${PEER_NUMBER}.${ORGANIZATION_NAME2}/msp:/etc/hyperledger/msp/peer
         - ./crypto-config/peerOrganizations/${COMPANY_DOMAIN}/peers/peer${PEER_NUMBER}.${ORGANIZATION_NAME2}/tls:/etc/hyperledger/tls
         - ./crypto-config/peerOrganizations/${COMPANY_DOMAIN}/users:/etc/hyperledger/msp/users
@@ -124,6 +125,7 @@ services:
       - 8053:7053
     volumes:
         - /var/run/:/host/var/run/
+        - ./mychannel-block:/etc/hyperledger/msp/peer/mychannel-block
         - ./crypto-config/peerOrganizations/${COMPANY2_DOMAIN}/peers/peer${PEER_NUMBER}.${ORGANIZATION2_NAME2}/msp:/etc/hyperledger/msp/peer
         - ./crypto-config/peerOrganizations/${COMPANY2_DOMAIN}/peers/peer${PEER_NUMBER}.${ORGANIZATION2_NAME2}/tls:/etc/hyperledger/tls
         - ./crypto-config/peerOrganizations/${COMPANY2_DOMAIN}/users:/etc/hyperledger/msp/users

@@ -24,7 +24,7 @@ docker-compose -p network -f docker-compose.yml up -d
 
 sleep 2
 # Create the channel
-docker exec cli.${ORGANIZATION_NAME2} peer channel create -o orderer.${ORGANIZATION_NAME2}:7050  -c mychannel -f /etc/hyperledger/configtx/channel.tx
+docker exec cli.${ORGANIZATION_NAME2} peer channel create -o orderer.${ORGANIZATION_NAME2}:7050 -c mychannel -f /etc/hyperledger/configtx/channel.tx
 
 # Join peer0.${ORGANIZATION_NAME2} to the channel.
 docker exec cli.${ORGANIZATION_NAME2} peer channel join -b mychannel.block 
@@ -32,8 +32,8 @@ docker exec cli.${ORGANIZATION_NAME2} peer channel join -b mychannel.block
 sleep 5
 
 # Join peer0.${ORGANIZATION2_NAME2} to the channel.
-docker exec -e "CORE_PEER_ADDRESS=peer0.${ORGANIZATION2_NAME2}:7051" -e "CORE_PEER_LOCALMSPID=Blockfiler2MSP" -e "CORE_PEER_MSPCONFIGPATH=/opt/peer/crypto/peerOrganizations/${COMPANY2_DOMAIN}/users/Admin@${COMPANY2_DOMAIN}/msp" cli.${ORGANIZATION_NAME2} peer channel join -b mychannel.block
-#docker exec cli.${ORGANIZATION2_NAME2} peer channel join -b mychannel.block
+#docker exec -e "CORE_PEER_ADDRESS=peer0.${ORGANIZATION2_NAME2}:7051" -e "CORE_PEER_LOCALMSPID=Blockfiler2MSP" -e "CORE_PEER_MSPCONFIGPATH=/opt/peer/crypto/peerOrganizations/${COMPANY2_DOMAIN}/users/Admin@${COMPANY2_DOMAIN}/msp" cli.${ORGANIZATION_NAME2} peer channel join -b mychannel.block
+docker exec cli.${ORGANIZATION2_NAME2} peer channel join -b mychannel.block
 
 sleep 5
 
