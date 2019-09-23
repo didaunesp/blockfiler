@@ -1,6 +1,6 @@
 'use strict';
 
-exports.createTx = function (request, response) {
+exports.createUser = function (request, response) {
 
 	var blockfiler = request.body;
 
@@ -21,25 +21,26 @@ exports.createTx = function (request, response) {
 
 	var member_user = null;
 	var store_path = path.join(__dirname, '/users');
-	console.log('Store path:'+store_path);
+	console.log('Store path:' + store_path);
 	var tx_id = null;
 
 	var jsonPayload = request.body;
-
-	var	key = blockfiler.key.toString();
-	var	content = blockfiler.content.toString();
+	console.log(blockfiler);
+	var key = blockfiler.key.toString();
+	var content = blockfiler.content.toString();
 
 	console.log("parameters ", key, content)
 
 	// create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
-	Fabric_Client.newDefaultKeyValueStore({ path: store_path
+	Fabric_Client.newDefaultKeyValueStore({
+		path: store_path
 	}).then((state_store) => {
 		// assign the store to the fabric client
 		fabric_client.setStateStore(state_store);
 		var crypto_suite = Fabric_Client.newCryptoSuite();
 		// use the same location for the state store (where the users' certificate are kept)
 		// and the crypto store (where the users' keys are kept)
-		var crypto_store = Fabric_Client.newCryptoKeyStore({path: store_path});
+		var crypto_store = Fabric_Client.newCryptoKeyStore({ path: store_path });
 		crypto_suite.setCryptoKeyStore(crypto_store);
 		fabric_client.setCryptoSuite(crypto_suite);
 
@@ -60,7 +61,7 @@ exports.createTx = function (request, response) {
 		// createCar chaincode function - requires 5 args, ex: args: ['CAR12', 'Honda', 'Accord', 'Black', 'Tom'],
 		// changeCarOwner chaincode function - requires 2 args , ex: args: ['CAR10', 'Dave'],
 		// must send the proposal to endorsing peers
-		var filerTransaction = {jsonPayload};
+		var filerTransaction = { jsonPayload };
 		console.log("FILER TRANSACTION ", JSON.stringify(filerTransaction));
 		var request = {
 			//targets: let default to the peer assigned to the client
@@ -74,18 +75,17 @@ exports.createTx = function (request, response) {
 		// send the transaction proposal to the peers
 		return channel.sendTransactionProposal(request);
 	}).then((results) => {
-		console.log(results);
 		var proposalResponses = results[0];
 		var proposal = results[1];
 		let isProposalGood = false;
 		if (proposalResponses && proposalResponses[0].response &&
 			proposalResponses[0].response.status === 200) {
-				isProposalGood = true;
-				console.log('Transaction proposal was good');
-			} else {
-				console.error('Transaction proposal was bad');
-				console.error('Proposal Response: '+proposalResponses[0].response.status);
-			}
+			isProposalGood = true;
+			console.log('Transaction proposal was good');
+		} else {
+			console.error('Transaction proposal was bad');
+			console.error('Proposal Response: ' + proposalResponses[0].response.status);
+		}
 		if (isProposalGood) {
 			console.log(util.format(
 				'Successfully sent Proposal and received ProposalResponse: Status - %s, message - "%s"',
@@ -117,7 +117,7 @@ exports.createTx = function (request, response) {
 				let handle = setTimeout(() => {
 					event_hub.unregisterTxEvent(transaction_id_string);
 					event_hub.disconnect();
-					resolve({event_status : 'TIMEOUT'}); //we could use reject(new Error('Trnasaction did not complete within 30 seconds'));
+					resolve({ event_status: 'TIMEOUT' }); //we could use reject(new Error('Trnasaction did not complete within 30 seconds'));
 				}, 3000);
 				event_hub.registerTxEvent(transaction_id_string, (tx, code) => {
 					// this is the callback for transaction event status
@@ -125,7 +125,7 @@ exports.createTx = function (request, response) {
 					clearTimeout(handle);
 
 					// now let the application know what happened
-					var return_status = {event_status : code, tx_id : transaction_id_string};
+					var return_status = { event_status: code, tx_id: transaction_id_string };
 					if (code !== 'VALID') {
 						console.error('The transaction was invalid, code = ' + code);
 						resolve(return_status); // we could use reject(new Error('Problem with the tranaction, event status ::'+code));
@@ -135,9 +135,9 @@ exports.createTx = function (request, response) {
 					}
 				}, (err) => {
 					//this is the callback if something goes wrong with the event registration or processing
-					reject(new Error('There was a problem with the eventhub ::'+err));
+					reject(new Error('There was a problem with the eventhub ::' + err));
 				},
-					{disconnect: true} //disconnect when complete
+					{ disconnect: true } //disconnect when complete
 				);
 				event_hub.connect();
 
@@ -157,7 +157,7 @@ exports.createTx = function (request, response) {
 			response.end("{\"erro\":false,\"response\":\"ok\"}");
 		} else {
 			console.error('Failed to order the transaction. Error code: ' + results[0].status);
-			response.end("{\"erro\":true,\"response\":\"o'Failed to order the transaction. Error code:" + results[0].status+"\"}");
+			response.end("{\"erro\":true,\"response\":\"o'Failed to order the transaction. Error code:" + results[0].status + "\"}");
 		}
 	}).catch((err) => {
 		console.error('Failed to invoke successfully :: ' + err);

@@ -1,6 +1,6 @@
 'use strict';
 
-exports.queryTx = function (request, response) {
+exports.queryHistory = function (request, response) {
 
 	var Fabric_Client = require('fabric-client');
 	var path = require('path');
@@ -18,21 +18,22 @@ exports.queryTx = function (request, response) {
 	//
 	var member_user = null;
 	var store_path = path.join(__dirname, './users');
-	console.log('Store path:'+store_path);
+	console.log('Store path:' + store_path);
 	var tx_id = null;
 
 	var jsonKey = request.body.key;
 	console.log("KEY ", jsonKey);
 
 	// create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
-	Fabric_Client.newDefaultKeyValueStore({ path: store_path
+	Fabric_Client.newDefaultKeyValueStore({
+		path: store_path
 	}).then((state_store) => {
 		// assign the store to the fabric client
 		fabric_client.setStateStore(state_store);
 		var crypto_suite = Fabric_Client.newCryptoSuite();
 		// use the same location for the state store (where the users' certificate are kept)
 		// and the crypto store (where the users' keys are kept)
-		var crypto_store = Fabric_Client.newCryptoKeyStore({path: store_path});
+		var crypto_store = Fabric_Client.newCryptoKeyStore({ path: store_path });
 		crypto_suite.setCryptoKeyStore(crypto_store);
 		fabric_client.setCryptoSuite(crypto_suite);
 
@@ -51,7 +52,7 @@ exports.queryTx = function (request, response) {
 		const request = {
 			//targets : --- letting this default to the peers assigned to the channel
 			chaincodeId: 'chaincode',
-			fcn: 'query',
+			fcn: 'history',
 			args: [jsonKey]
 		};
 
@@ -68,11 +69,12 @@ exports.queryTx = function (request, response) {
 				transactionResponse = transactionResponse.replace("[\"", "[");
 				transactionResponse = transactionResponse.replace("}\"]", "}]");
 				transactionResponse = transactionResponse.replace(/\\/g, "");
-				transactionResponse = transactionResponse.replace(/]}}","{"header/g , "]}}, {\"header");
-				transactionResponse = transactionResponse.replace(/]}}","{"body/g , "]}}, {\"body");
-				transactionResponse = transactionResponse.replace(/]}}","{"transactionId/g , "]}}, {\"transactionId");
+				transactionResponse = transactionResponse.replace(/]}}","{"header/g, "]}}, {\"header");
+				transactionResponse = transactionResponse.replace(/]}}","{"body/g, "]}}, {\"body");
+				transactionResponse = transactionResponse.replace(/]}}","{"transactionId/g, "]}}, {\"transactionId");
 				console.log("Response is ", transactionResponse);
-				response.end("{\"content\": "+transactionResponse+"}");
+				response.end("{\"content\": " + transactionResponse + "}");
+
 			}
 		} else {
 			console.log("No payloads were returned from query");
