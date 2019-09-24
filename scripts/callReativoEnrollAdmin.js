@@ -45,7 +45,7 @@ Fabric_Client.newDefaultKeyValueStore({
     } else {
         // need to enroll it with CA server
         return fabric_ca_client.enroll({
-            enrollmentID: user,
+            enrollmentID: 'admin',
             enrollmentSecret: 'adminpw'
         }).then((enrollment) => {
             console.log('Successfully enrolled ' + user + ' user "' + user + '"');
