@@ -22,6 +22,8 @@ type SmartContract struct {
 type Register struct {
 	Key     string `json:"key"`
 	Content string `json:"content"`
+	User    string `json:"user"`
+	Time    string `json:"time"`
 }
 
 func (s *SmartContract) Init(APIstub shim.ChaincodeStubInterface) sc.Response {
@@ -52,6 +54,25 @@ func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string
 	}
 
 	QueryAsBytes, _ := APIstub.GetState(args[0])
+
+	// Unmarshal string into structs.
+	var registers []Register
+	json.Unmarshal(QueryAsBytes, &registers)
+
+	// Loop over structs and update user and time
+	for r := range registers {
+		registers[r].User = "user"
+		registers[r].Time = time.Now().String()
+		registerAsBytes, err := json.Marshal(registers[r])
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		err2 := APIstub.PutState(registers[r].Key, registerAsBytes)
+		if err2 != nil {
+			return shim.Error(err.Error())
+		}
+	}
+
 	return shim.Success(QueryAsBytes)
 }
 
@@ -121,20 +142,20 @@ func (s *SmartContract) create(APIstub shim.ChaincodeStubInterface, args []strin
 
 	// keyAsBytes, _ := json.Marshal(args[1])
 	// fmt.Println("contentAsBytes ", keyAsBytes)
-	register := &register(key, content)
+	register := &Register{key, content, "user", time.Now().String()}
 	registerAsBytes, err := json.Marshal(register)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 
-	// err = APIstub.PutState(key, keyAsBytes)
-	// if err != nil {
-	// 	return shim.Error(err.Error())
-	// }
-	err2 := stub.PutPrivateData("collectionAtivo", key, registerAsBytes)
+	err2 := APIstub.PutState(key, registerAsBytes)
 	if err2 != nil {
 		return shim.Error(err.Error())
 	}
+	// err2 := stub.PutPrivateData("collectionAtivo", key, registerAsBytes)
+	// if err2 != nil {
+	// 	return shim.Error(err.Error())
+	// }
 
 	return shim.Success(nil)
 }

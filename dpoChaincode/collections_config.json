@@ -1,0 +1,29 @@
+[
+    {
+         "name": "collectionPublic",
+         "policy": "OR('EmpresaMSP.member', 'CallAtivoMSP.member', 'CallReativoMSP.member')",
+         "requiredPeerCount": 0,
+         "maxPeerCount": 3,
+         "blockToLive":1000000,
+         "memberOnlyRead": true
+    },
+
+    {
+        "name": "collectionAtivo",
+        "policy": "OR('EmpresaMSP.member', 'CallAtivoMSP.member')",
+        "requiredPeerCount": 0,
+        "maxPeerCount": 3,
+        "blockToLive":3,
+        "memberOnlyRead": true
+    },
+  
+    {
+         "name": "collectionReativo",
+         "policy": "OR('EmpresaMSP.member', 'CallReativoMSP.member')",
+         "requiredPeerCount": 0,
+         "maxPeerCount": 3,
+         "blockToLive":3,
+         "memberOnlyRead": true
+    }
+
+  ]
