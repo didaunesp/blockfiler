@@ -12,6 +12,7 @@ var fabric_client = new Fabric_Client();
 var fabric_ca_client = null;
 var admin_user = null;
 var member_user = null;
+var user = "OperadorCallReativo"
 var store_path = path.join(__dirname, './users');
 console.log(' Store path:' + store_path);
 
@@ -32,10 +33,10 @@ Fabric_Client.newDefaultKeyValueStore({
         verify: false
     };
     // be sure to change the http to https when the CA is running TLS enabled
-    fabric_ca_client = new Fabric_CA_Client('http://localhost:7054', tlsOptions, null, crypto_suite);
+    fabric_ca_client = new Fabric_CA_Client('http://localhost:9054', tlsOptions, null, crypto_suite);
 
     // first check to see if the admin is already enrolled
-    return fabric_client.getUserContext('admin', true);
+    return fabric_client.getUserContext(user, true);
 }).then((user_from_store) => {
     if (user_from_store && user_from_store.isEnrolled()) {
         console.log('Successfully loaded admin from persistence');
@@ -44,18 +45,18 @@ Fabric_Client.newDefaultKeyValueStore({
     } else {
         // need to enroll it with CA server
         return fabric_ca_client.enroll({
-            enrollmentID: 'admin',
+            enrollmentID: user,
             enrollmentSecret: 'adminpw'
         }).then((enrollment) => {
-            console.log('Successfully enrolled admin user "admin"');
+            console.log('Successfully enrolled ' + user + ' user "' + user + '"');
             return fabric_client.createUser(
                 {
-                    username: 'admin',
+                    username: user,
                     mspid: 'CallReativoMSP',
                     cryptoContent: { privateKeyPEM: enrollment.key.toBytes(), signedCertPEM: enrollment.certificate }
                 });
-        }).then((user) => {
-            admin_user = user;
+        }).then((user_m) => {
+            admin_user = user_m;
             return fabric_client.setUserContext(admin_user);
         }).catch((err) => {
             console.error('Failed to enroll and persist admin. Error: ' + err.stack ? err.stack : err);
