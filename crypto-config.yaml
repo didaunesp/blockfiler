@@ -1,7 +1,7 @@
 
 OrdererOrgs:
   - Name: Orderer
-    Domain: blockfiler.com
+    Domain: empresa.com
     Specs:
       - Hostname: orderer
         SANS:
@@ -9,24 +9,24 @@ OrdererOrgs:
           - "127.0.0.1"
 
 PeerOrgs:
-  - Name: Blockfiler
-    Domain: blockfiler.com
+  - Name: Empresa
+    Domain: empresa.com
     EnableNodeOUs: true
     Template:
       Count: 1
     Users:
       Count: 0
   
-  - Name: Blockfiler2
-    Domain: blockfiler2.com
+  - Name: CallAtivo
+    Domain: callativo.com
     EnableNodeOUs: true
     Template:
       Count: 1
     Users:
       Count: 0
 
-  - Name: Blockfiler3
-    Domain: blockfiler3.com
+  - Name: CallReativo
+    Domain: callreativo.com
     EnableNodeOUs: true
     Template:
       Count: 1

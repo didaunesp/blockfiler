@@ -6,18 +6,18 @@ set -ev
 export MSYS_NO_PATHCONV=1
 export CHANNEL_NAME=mychannel
 
-export COMPANY_DOMAIN=blockfiler.com
+export COMPANY_DOMAIN=empresa.com
 export PEER_NUMBER=0
-export ORGANIZATION_NAME=Blockfiler
-export ORGANIZATION_NAME2=blockfiler.com
+export ORGANIZATION_NAME=Empresa
+export ORGANIZATION_NAME2=empresa.com
 
-export COMPANY2_DOMAIN=blockfiler2.com
-export ORGANIZATION2_NAME=Blockfiler2
-export ORGANIZATION2_NAME2=blockfiler2.com
+export COMPANY2_DOMAIN=callativo.com
+export ORGANIZATION2_NAME=CallAtivo
+export ORGANIZATION2_NAME2=callativo.com
 
-export COMPANY3_DOMAIN=blockfiler3.com
-export ORGANIZATION3_NAME=Blockfiler3
-export ORGANIZATION3_NAME2=blockfiler3.com
+export COMPANY3_DOMAIN=callreativo.com
+export ORGANIZATION3_NAME=CallReativo
+export ORGANIZATION3_NAME2=callreativo.com
 
 rm -rf ./client/controllers/users/*
 
@@ -46,7 +46,7 @@ sleep 2
 # Join peer0.${ORGANIZATION2_NAME2} to the channel.
 docker exec cli.${ORGANIZATION2_NAME2} peer channel join -b ${CHANNEL_NAME}.block
 
-sleep 5
+sleep 2
 
 #fetch channel block for org 3
 docker exec  cli.${ORGANIZATION3_NAME2} peer channel fetch 0 ${CHANNEL_NAME}.block -o orderer.${ORGANIZATION_NAME2}:7050 -c ${CHANNEL_NAME}
@@ -56,19 +56,22 @@ sleep 2
 # Join peer0.${ORGANIZATION3_NAME2} to the channel.
 docker exec cli.${ORGANIZATION3_NAME2} peer channel join -b ${CHANNEL_NAME}.block
 
-sleep 5
+sleep 2
 
 #update org1 anchor peer
-docker exec cli.${ORGANIZATION_NAME2} peer channel -c ${CHANNEL_NAME} update -o orderer.${ORGANIZATION_NAME2}:7050 -f /etc/hyperledger/configtx/Org1MSPanchors.tx 
+docker exec cli.${ORGANIZATION_NAME2} peer channel -c ${CHANNEL_NAME} update -o orderer.${ORGANIZATION_NAME2}:7050 -f /etc/hyperledger/configtx/EmpresaMSPanchors.tx 
 #update org2 anchor peer
-docker exec cli.${ORGANIZATION2_NAME2} peer channel -c ${CHANNEL_NAME} update -o orderer.${ORGANIZATION_NAME2}:7050 -f /etc/hyperledger/configtx/Org2MSPanchors.tx
+docker exec cli.${ORGANIZATION2_NAME2} peer channel -c ${CHANNEL_NAME} update -o orderer.${ORGANIZATION_NAME2}:7050 -f /etc/hyperledger/configtx/CallAtivoMSPanchors.tx
 #update org3 anchor peer
-docker exec cli.${ORGANIZATION3_NAME2} peer channel -c ${CHANNEL_NAME} update -o orderer.${ORGANIZATION_NAME2}:7050 -f /etc/hyperledger/configtx/Org3MSPanchors.tx
+docker exec cli.${ORGANIZATION3_NAME2} peer channel -c ${CHANNEL_NAME} update -o orderer.${ORGANIZATION_NAME2}:7050 -f /etc/hyperledger/configtx/CallReativoMSPanchors.tx
 
 sleep 2
 
 #install chaincode on peer 1
 docker exec cli.${ORGANIZATION_NAME2} peer chaincode install -n chaincode -v 1.0 -p github.com/chaincode -l golang
+
+#install dpoChaincode on peer 1
+docker exec cli.${ORGANIZATION_NAME2} peer chaincode install -n dpoChaincode -v 1.0 -p github.com/dpoChaincode -l golang
 
 sleep 2
 
@@ -83,4 +86,7 @@ docker exec cli.${ORGANIZATION3_NAME2} peer chaincode install -n chaincode -v 1.
 sleep 2
 
 #instantiate chaincode on peer 1
-docker exec cli.${ORGANIZATION_NAME2} peer chaincode instantiate -o orderer.${ORGANIZATION_NAME2}:7050 -C ${CHANNEL_NAME} -n chaincode -l golang -v 1.0 -c '{"Args":[]}' -P "OR('BlockfilerMSP.member')" 
+docker exec cli.${ORGANIZATION_NAME2} peer chaincode instantiate -o orderer.${ORGANIZATION_NAME2}:7050 -C ${CHANNEL_NAME} -n chaincode -l golang -v 1.0 -c '{"Args":[]}' -P "OR('EmpresaMSP.member', 'CallAtivoMSP.member', 'CallPassivo.member')" 
+
+#instantiate dpoChaincode on peer 1
+docker exec cli.${ORGANIZATION_NAME2} peer chaincode instantiate -o orderer.${ORGANIZATION_NAME2}:7050 -C ${CHANNEL_NAME} -n dpoChaincode -l golang -v 1.0 -c '{"Args":[]}' -P "OR('EmpresaMSP.member')" 

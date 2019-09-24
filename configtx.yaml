@@ -12,7 +12,7 @@ Organizations:
         ID: OrdererMSP
 
         # MSPDir is the filesystem path which contains the MSP configuration
-        MSPDir: crypto-config/ordererOrganizations/blockfiler.com/msp
+        MSPDir: crypto-config/ordererOrganizations/empresa.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -28,13 +28,13 @@ Organizations:
                 Type: Signature
                 Rule: "OR('OrdererMSP.admin')"
 
-    - &Organization
-        Name: BlockfilerMSP
+    - &Empresa
+        Name: EmpresaMSP
 
         # ID to load the MSP definition as
-        ID: BlockfilerMSP
+        ID: EmpresaMSP
 
-        MSPDir: crypto-config/peerOrganizations/blockfiler.com/msp
+        MSPDir: crypto-config/peerOrganizations/empresa.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -42,29 +42,29 @@ Organizations:
         # Policies:
         #     Readers:
         #         Type: Signature
-        #         Rule: "OR('BlockfilerMSP.admin', BlockfilerMSP.peer', BlockfilerMSP.client')"
+        #         Rule: "OR('EmpresaMSP.admin', EmpresaMSP.peer', EmpresaMSP.client')"
         #     Writers:
         #         Type: Signature
-        #         Rule: "OR(BlockfilerMSP.admin', BlockfilerMSP.peer', BlockfilerMSP.client')"
+        #         Rule: "OR(EmpresaMSP.admin', EmpresaMSP.peer', EmpresaMSP.client')"
         #     Admins:
         #         Type: Signature
-        #         Rule: "OR(BlockfilerMSP.admin')"
+        #         Rule: "OR(EmpresaMSP.admin')"
 
         # leave this flag set to true.
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0.blockfiler.com
+            - Host: peer0.empresa.com
               Port: 7051
       
-    - &Organization2
-        Name: Blockfiler2MSP
+    - &CallAtivo
+        Name: CallAtivoMSP
 
         # ID to load the MSP definition as
-        ID: Blockfiler2MSP
+        ID: CallAtivoMSP
 
-        MSPDir: crypto-config/peerOrganizations/blockfiler2.com/msp
+        MSPDir: crypto-config/peerOrganizations/callativo.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -72,29 +72,29 @@ Organizations:
         # Policies:
         #     Readers:
         #         Type: Signature
-        #         Rule: "OR('BlockfilerMSP.admin', BlockfilerMSP.peer', BlockfilerMSP.client')"
+        #         Rule: "OR('CallAtivoMSP.admin', CallAtivoMSP.peer', CallAtivoMSP.client')"
         #     Writers:
         #         Type: Signature
-        #         Rule: "OR(BlockfilerMSP.admin', BlockfilerMSP.peer', BlockfilerMSP.client')"
+        #         Rule: "OR(CallAtivoMSP.admin', CallAtivoMSP.peer', CallAtivoMSP.client')"
         #     Admins:
         #         Type: Signature
-        #         Rule: "OR(BlockfilerMSP.admin')"
+        #         Rule: "OR(CallAtivoMSP.admin')"
 
         # leave this flag set to true.
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0.blockfiler2.com
+            - Host: peer0.callativo.com
               Port: 7051
     
-    - &Organization3
-        Name: Blockfiler3MSP
+    - &CallReativo
+        Name: CallReativoMSP
 
         # ID to load the MSP definition as
-        ID: Blockfiler3MSP
+        ID: CallReativoMSP
 
-        MSPDir: crypto-config/peerOrganizations/blockfiler3.com/msp
+        MSPDir: crypto-config/peerOrganizations/callreativo.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -102,20 +102,20 @@ Organizations:
         # Policies:
         #     Readers:
         #         Type: Signature
-        #         Rule: "OR('BlockfilerMSP.admin', BlockfilerMSP.peer', BlockfilerMSP.client')"
+        #         Rule: "OR('CallReativoMSP.admin', CallReativoMSP.peer', CallReativoMSP.client')"
         #     Writers:
         #         Type: Signature
-        #         Rule: "OR(BlockfilerMSP.admin', BlockfilerMSP.peer', BlockfilerMSP.client')"
+        #         Rule: "OR(CallReativoMSP.admin', CallReativoMSP.peer', CallReativoMSP.client')"
         #     Admins:
         #         Type: Signature
-        #         Rule: "OR(BlockfilerMSP.admin')"
+        #         Rule: "OR(CallReativoMSP.admin')"
 
         # leave this flag set to true.
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0.blockfiler3.com
+            - Host: peer0.callreativo.com
               Port: 7051
 
 Capabilities:
@@ -201,7 +201,7 @@ Orderer: &OrdererDefaults
     OrdererType: solo
 
     Addresses:
-        - orderer.blockfiler.com:7050
+        - orderer.empresa.com:7050
 
     # Batch Timeout: The amount of time to wait before creating a batch
     BatchTimeout: 2s
@@ -297,16 +297,16 @@ Profiles:
         Consortiums:
             FabricConsortium:
                 Organizations:
-                    - *Organization
-                    - *Organization2
-                    - *Organization3
+                    - *Empresa
+                    - *CallAtivo
+                    - *CallReativo
     Channel:
         Consortium: FabricConsortium
         Application:
             <<: *ApplicationDefaults
             Organizations:
-                - *Organization
-                - *Organization2
-                - *Organization3
+                - *Empresa
+                - *CallAtivo
+                - *CallReativo
             Capabilities:
                 <<: *ApplicationCapabilities

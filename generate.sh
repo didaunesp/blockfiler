@@ -33,23 +33,23 @@ if [ "$?" -ne 0 ]; then
   exit 1
 fi
 
-# generate anchor peer transaction
-configtxgen -profile Channel -outputAnchorPeersUpdate ./config/Org1MSPanchors.tx -channelID $CHANNEL_NAME -asOrg BlockfilerMSP
+# generate anchor peer empresa transaction
+configtxgen -profile Channel -outputAnchorPeersUpdate ./config/EmpresaMSPanchors.tx -channelID $CHANNEL_NAME -asOrg EmpresaMSP
 if [ "$?" -ne 0 ]; then
-  echo "Failed to generate anchor peer update for BlockfilerMSP..."
+  echo "Failed to generate anchor peer update for Empresa..."
   exit 1
 fi
 
-# generate anchor peer org 2 transaction
-configtxgen -profile Channel -outputAnchorPeersUpdate ./config/Org2MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Blockfiler2MSP
+# generate anchor peer callativo transaction
+configtxgen -profile Channel -outputAnchorPeersUpdate ./config/CallAtivoMSPanchors.tx -channelID $CHANNEL_NAME -asOrg CallAtivoMSP
 if [ "$?" -ne 0 ]; then
-  echo "Failed to generate anchor peer update for Blockfiler2MSP..."
+  echo "Failed to generate anchor peer update for CallAtivoMSP..."
   exit 1
 fi
 
-# generate anchor peer org 3 transaction
-configtxgen -profile Channel -outputAnchorPeersUpdate ./config/Org3MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Blockfiler3MSP
+# generate anchor peer callreativo transaction
+configtxgen -profile Channel -outputAnchorPeersUpdate ./config/CallReativoMSPanchors.tx -channelID $CHANNEL_NAME -asOrg CallReativoMSP
 if [ "$?" -ne 0 ]; then
-  echo "Failed to generate anchor peer update for Blockfiler3MSP..."
+  echo "Failed to generate anchor peer update for CallReativoMSP..."
   exit 1
 fi

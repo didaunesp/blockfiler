@@ -4,14 +4,14 @@ networks:
   network: 
 
 services:
-  rca:
+  empresa_ca:
     extends:
       file: base/rca-base.yaml
       service: rca-base
     container_name: rca.${ORGANIZATION_NAME2}
     environment:
-        - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.blockfiler.com-cert.pem
-        - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/e7ae5513367acd3b0f431a2d53acaf2cf551f3107db8e920c0d7b44af913f6fe_sk
+        - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.${COMPANY_DOMAIN}-cert.pem
+        - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/c1ef41d8f1f3279195ddad5fb11b6c4ce226ed9021478221204300d939b9b7a4_sk
     volumes:
         - ./${ORGANIZATION_NAME2}/:/etc/hyperledger/fabric-ca
         - ./${ORGANIZATION_NAME2}/server:/etc/hyperledger/fabric-ca-server
@@ -20,14 +20,14 @@ services:
     ports:
         - 7054:7054
 
-  rca2:
+  callativo_ca:
     extends:
       file: base/rca-base.yaml
       service: rca-base
     container_name: rca.${ORGANIZATION2_NAME2}
     environment:
-        - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.blockfiler2.com-cert.pem
-        - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/398a24daacd79dcdf9d0f5521e31243a7674bc04f18a297eab19d950225fb2fb_sk
+        - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.${COMPANY2_DOMAIN}-cert.pem
+        - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/6d870bc2a4aff24d69b90cbac4bf140f1bd4fd04086f9212cecd8fcc5894bad5_sk
     volumes:
         - ./${ORGANIZATION2_NAME2}/:/etc/hyperledger/fabric-ca
         - ./${ORGANIZATION2_NAME2}/server:/etc/hyperledger/fabric-ca-server
@@ -36,19 +36,19 @@ services:
     ports:
         - 8054:7054
 
-  rca3:
+  callreativo_ca:
     extends:
       file: base/rca-base.yaml
       service: rca-base
     container_name: rca.${ORGANIZATION3_NAME2}
     environment:
-        - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.blockfiler3.com-cert.pem
-        - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/8597aadb54b1be98a8bcc571c74a4ca3da95e2a7f451b4a02355691a726e5244_sk
+        - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.${COMPANY3_DOMAIN}-cert.pem
+        - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/0269bfd452f50b865b118266c9523dc2741ff4319582a1fcdbc80f39b4a921d8_sk
     volumes:
         - ./${ORGANIZATION3_NAME2}/:/etc/hyperledger/fabric-ca
         - ./${ORGANIZATION3_NAME2}/server:/etc/hyperledger/fabric-ca-server
         - ./${ORGANIZATION3_NAME2}/client:/etc/hyperledger/fabric-ca-client
-        - ./crypto-config/peerOrganizations/${COMPANY2_DOMAIN}/ca/:/etc/hyperledger/fabric-ca-server-config
+        - ./crypto-config/peerOrganizations/${COMPANY3_DOMAIN}/ca/:/etc/hyperledger/fabric-ca-server-config
     ports:
         - 9054:7054
 
@@ -78,14 +78,14 @@ services:
     networks:
       - network
 
-  peer1:
+  peer_empresa:
     extends:
       file: base/peer-base.yaml
       service: peer-base
     container_name: peer${PEER_NUMBER}.${ORGANIZATION_NAME2}
     environment:
       - CORE_PEER_ID=peer${PEER_NUMBER}.${COMPANY_DOMAIN}
-      - CORE_PEER_LOCALMSPID=BlockfilerMSP
+      - CORE_PEER_LOCALMSPID=${ORGANIZATION_NAME}MSP
       - CORE_PEER_ADDRESS=peer${PEER_NUMBER}.${ORGANIZATION_NAME2}:7051
     ports:
       - 7051:7051
@@ -98,14 +98,14 @@ services:
       - orderer
       - couchdb
 
-  peer2:
+  peer_callativo:
     extends:
       file: base/peer-base.yaml
       service: peer-base
     container_name: peer${PEER_NUMBER}.${ORGANIZATION2_NAME2}
     environment:
       - CORE_PEER_ID=peer${PEER_NUMBER}.${COMPANY2_DOMAIN}
-      - CORE_PEER_LOCALMSPID=Blockfiler2MSP
+      - CORE_PEER_LOCALMSPID=${ORGANIZATION2_NAME}MSP
       - CORE_PEER_ADDRESS=peer${PEER_NUMBER}.${ORGANIZATION2_NAME2}:7051
     ports:
       - 8051:7051
@@ -118,14 +118,14 @@ services:
       - orderer
       - couchdb
 
-  peer3:
+  peer_callreativo:
     extends:
       file: base/peer-base.yaml
       service: peer-base
     container_name: peer${PEER_NUMBER}.${ORGANIZATION3_NAME2}
     environment:
       - CORE_PEER_ID=peer${PEER_NUMBER}.${COMPANY3_DOMAIN}
-      - CORE_PEER_LOCALMSPID=Blockfiler3MSP
+      - CORE_PEER_LOCALMSPID=${ORGANIZATION3_NAME}MSP
       - CORE_PEER_ADDRESS=peer${PEER_NUMBER}.${ORGANIZATION3_NAME2}:7051
     ports:
       - 9051:7051
@@ -138,7 +138,7 @@ services:
       - orderer
       - couchdb
 
-  cli:
+  empresa_cli:
     extends:
       file: base/cli-base.yaml
       service: cli-base
@@ -146,16 +146,18 @@ services:
     environment:
       - CORE_PEER_ID=cli
       - CORE_PEER_ADDRESS=peer${PEER_NUMBER}.${ORGANIZATION_NAME2}:7051
-      - CORE_PEER_LOCALMSPID=BlockfilerMSP
+      - CORE_PEER_LOCALMSPID=${ORGANIZATION_NAME}MSP
       - CORE_PEER_MSPCONFIGPATH=/opt/peer/crypto/peerOrganizations/${COMPANY_DOMAIN}/users/Admin@${COMPANY_DOMAIN}/msp
       # - CORE_PEER_TLS_ENABLED=true    
       # - CORE_PEER_TLS_CERT_FILE=/opt/peer/crypto/peerOrganizations/${COMPANY_DOMAIN}/users/Admin@${COMPANY_DOMAIN}/tls/server.crt
       # - CORE_PEER_TLS_KEY_FILE=/opt/peer/crypto/peerOrganizations/${COMPANY_DOMAIN}/users/Admin@${COMPANY_DOMAIN}/tls/server.key
       # - CORE_PEER_TLS_ROOTCERT_FILE=/opt/peer/crypto/peerOrganizations/${COMPANY_DOMAIN}/users/Admin@${COMPANY_DOMAIN}/tls/ca.crt
+    volumes:
+      - ./dpoChaincode/:/opt/gopath/src/github.com/dpoChaincode
     depends_on:
-      - peer1
+      - peer_empresa
 
-  cli2:
+  callativo_cli:
     extends:
       file: base/cli-base.yaml
       service: cli-base
@@ -163,12 +165,12 @@ services:
     environment:
       - CORE_PEER_ID=cli
       - CORE_PEER_ADDRESS=peer${PEER_NUMBER}.${ORGANIZATION2_NAME2}:7051
-      - CORE_PEER_LOCALMSPID=Blockfiler2MSP
+      - CORE_PEER_LOCALMSPID=${ORGANIZATION2_NAME}MSP
       - CORE_PEER_MSPCONFIGPATH=/opt/peer/crypto/peerOrganizations/${COMPANY2_DOMAIN}/users/Admin@${COMPANY2_DOMAIN}/msp
     depends_on:
-      - peer2
+      - peer_callativo
 
-  cli3:
+  call_reativo_cli:
     extends:
       file: base/cli-base.yaml
       service: cli-base
@@ -176,10 +178,10 @@ services:
     environment:
       - CORE_PEER_ID=cli
       - CORE_PEER_ADDRESS=peer${PEER_NUMBER}.${ORGANIZATION3_NAME2}:7051
-      - CORE_PEER_LOCALMSPID=Blockfiler3MSP
+      - CORE_PEER_LOCALMSPID=${ORGANIZATION3_NAME}MSP
       - CORE_PEER_MSPCONFIGPATH=/opt/peer/crypto/peerOrganizations/${COMPANY3_DOMAIN}/users/Admin@${COMPANY3_DOMAIN}/msp
     depends_on:
-      - peer3
+      - peer_callreativo
 
   couchdb:
     container_name: couchdb.${ORGANIZATION_NAME2}
