@@ -65,7 +65,7 @@ exports.createUser = function (request, response) {
 		console.log("FILER TRANSACTION ", JSON.stringify(filerTransaction));
 		var request = {
 			//targets: let default to the peer assigned to the client
-			chaincodeId: 'chaincode',
+			chaincodeId: 'dpoChaincode',
 			fcn: 'create',
 			args: [key, content],
 			chainId: 'mychannel',
