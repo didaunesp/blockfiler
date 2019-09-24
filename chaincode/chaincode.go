@@ -32,7 +32,7 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 
 	if function == "query" {
 		return s.query(APIstub, args)
-	} 
+	}
 
 	return shim.Error("Invalid Smart Contract function name.")
 }
@@ -44,6 +44,7 @@ func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string
 	}
 
 	QueryAsBytes, _ := APIstub.GetState(args[0])
+	fmt.Printf("QueryAsBytes: %s", QueryAsBytes)
 	return shim.Success(QueryAsBytes)
 }
 

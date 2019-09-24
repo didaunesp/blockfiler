@@ -71,7 +71,7 @@ exports.createUser = function (request, response) {
 			chainId: 'mychannel',
 			txId: tx_id
 		};
-
+		console.log('request', request);
 		// send the transaction proposal to the peers
 		return channel.sendTransactionProposal(request);
 	}).then((results) => {

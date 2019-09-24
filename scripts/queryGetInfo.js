@@ -20,7 +20,7 @@ exports.queryInfo = function (request, response) {
 	var store_path = path.join(__dirname, './users');
 	console.log('Store path:' + store_path);
 	var tx_id = null;
-
+	console.log('REQUEST', request.body);
 	var jsonKey = request.body.key;
 	console.log("KEY ", jsonKey);
 
@@ -65,6 +65,7 @@ exports.queryInfo = function (request, response) {
 			if (query_responses[0] instanceof Error) {
 				console.error("error from query = ", query_responses[0]);
 			} else {
+				console.log(query_responses);
 				var transactionResponse = query_responses[0].toString();
 				transactionResponse = transactionResponse.replace("[\"", "[");
 				transactionResponse = transactionResponse.replace("}\"]", "}]");
