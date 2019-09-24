@@ -5,7 +5,6 @@ package main
  * 2 specific Hyperledger Fabric specific libraries for Smart Contracts
  */
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
