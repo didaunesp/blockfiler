@@ -44,7 +44,7 @@ Fabric_Client.newDefaultKeyValueStore({
     fabric_ca_client = new Fabric_CA_Client('http://localhost:8054', null, '', crypto_suite);
 
     // first check to see if the admin is already enrolled
-    return fabric_client.getUserContext('admin', true);
+    return fabric_client.getUserContext(user, true);
 }).then((user_from_store) => {
     if (user_from_store && user_from_store.isEnrolled()) {
         console.log('Successfully loaded admin from persistence');
