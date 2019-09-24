@@ -115,14 +115,24 @@ func (s *SmartContract) history(APIstub shim.ChaincodeStubInterface, args []stri
 func (s *SmartContract) create(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 	var err error
 
-	fmt.Println("content ", args[0])
+	fmt.Println("key ", args[0])
 	var key = args[0]
+	var content = args[1]
 
-	keyAsBytes, _ := json.Marshal(args[1])
-	fmt.Println("keyAsBytes ", keyAsBytes)
-
-	err = APIstub.PutState(key, keyAsBytes)
+	// keyAsBytes, _ := json.Marshal(args[1])
+	// fmt.Println("contentAsBytes ", keyAsBytes)
+	register := &register(key, content)
+	registerAsBytes, err := json.Marshal(register)
 	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	// err = APIstub.PutState(key, keyAsBytes)
+	// if err != nil {
+	// 	return shim.Error(err.Error())
+	// }
+	err2 := stub.PutPrivateData("collectionAtivo", key, registerAsBytes)
+	if err2 != nil {
 		return shim.Error(err.Error())
 	}
 

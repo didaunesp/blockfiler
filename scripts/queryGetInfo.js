@@ -38,7 +38,7 @@ exports.queryInfo = function (request, response) {
 		fabric_client.setCryptoSuite(crypto_suite);
 
 		// get the enrolled user from persistence, this user will sign all requests
-		return fabric_client.getUserContext('DPOcli1', true);
+		return fabric_client.getUserContext('CallReativocli1', true);
 	}).then((user_from_store) => {
 		if (user_from_store && user_from_store.isEnrolled()) {
 			console.log('Successfully loaded DPOcli1 from persistence');
