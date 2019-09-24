@@ -21,7 +21,7 @@ var fabric_ca_client = null;
 var admin_user = null;
 var member_user = null;
 var store_path = path.join(__dirname, './users');
-var user = "OperadorCallAtivo"
+var user = "DPO"
 console.log(' Store path:' + store_path);
 
 // create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
@@ -44,7 +44,7 @@ Fabric_Client.newDefaultKeyValueStore({
     fabric_ca_client = new Fabric_CA_Client('http://localhost:8054', null, '', crypto_suite);
 
     // first check to see if the admin is already enrolled
-    return fabric_client.getUserContext('admin', true);
+    return fabric_client.getUserContext(user, true);
 }).then((user_from_store) => {
     if (user_from_store && user_from_store.isEnrolled()) {
         console.log('Successfully loaded admin from persistence');
@@ -55,17 +55,17 @@ Fabric_Client.newDefaultKeyValueStore({
 
     // at this point we should have the admin user
     // first need to register the user with the CA server
-    return fabric_ca_client.register({ enrollmentID: user, affiliation: null, role: 'client' }, admin_user);
+    return fabric_ca_client.register({ enrollmentID: user + 'cli', affiliation: null, role: 'client' }, admin_user);
 }).then((secret) => {
     // next we need to enroll the user with CA server
-    console.log('Successfully registered ' + user + ' - secret:' + secret);
+    console.log('Successfully registered ' + user + 'cli' + ' - secret:' + secret);
 
-    return fabric_ca_client.enroll({ enrollmentID: user, enrollmentSecret: secret });
+    return fabric_ca_client.enroll({ enrollmentID: user + 'cli', enrollmentSecret: secret });
 }).then((enrollment) => {
     console.log('Successfully enrolled member ' + user + ' "' + user + '" ');
     return fabric_client.createUser(
         {
-            username: user,
+            username: user + 'cli1',
             mspid: 'CallAtivoMSP',
             cryptoContent: { privateKeyPEM: enrollment.key.toBytes(), signedCertPEM: enrollment.certificate }
         });
