@@ -58,14 +58,14 @@ Fabric_Client.newDefaultKeyValueStore({
     return fabric_ca_client.register({ enrollmentID: user + 'cli1', affiliation: null, role: 'client' }, admin_user);
 }).then((secret) => {
     // next we need to enroll the user with CA server
-    console.log('Successfully registered ' + user + 'cli' + ' - secret:' + secret);
+    console.log('Successfully registered ' + user + 'cli1' + ' - secret:' + secret);
 
     return fabric_ca_client.enroll({ enrollmentID: user + 'cli1', enrollmentSecret: secret });
 }).then((enrollment) => {
     console.log('Successfully enrolled member ' + user + ' "' + user + '" ');
     return fabric_client.createUser(
         {
-            username: user + 'cli2',
+            username: user + 'cli1',
             mspid: 'CallAtivoMSP',
             cryptoContent: { privateKeyPEM: enrollment.key.toBytes(), signedCertPEM: enrollment.certificate }
         });

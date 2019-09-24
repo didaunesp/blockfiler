@@ -65,7 +65,7 @@ Fabric_Client.newDefaultKeyValueStore({
     console.log('Successfully enrolled member ' + user + ' "' + user + '" ');
     return fabric_client.createUser(
         {
-            username: user + 'cli2',
+            username: user + 'cli1',
             mspid: 'CallReativoMSP',
             cryptoContent: { privateKeyPEM: enrollment.key.toBytes(), signedCertPEM: enrollment.certificate }
         });

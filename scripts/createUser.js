@@ -45,13 +45,13 @@ exports.createUser = function (request, response) {
 		fabric_client.setCryptoSuite(crypto_suite);
 
 		// get the enrolled user from persistence, this user will sign all requests
-		return fabric_client.getUserContext('DPOcli2', true);
+		return fabric_client.getUserContext('DPOcli1', true);
 	}).then((user_from_store) => {
 		if (user_from_store && user_from_store.isEnrolled()) {
 			console.log('Successfully loaded use from persistence');
 			member_user = user_from_store;
 		} else {
-			throw new Error('Failed to get DPOcli2.... run registerUser.js');
+			throw new Error('Failed to get DPOcli1.... run registerUser.js');
 		}
 		console.log("loaded config file");
 		// get a transaction id object based on the current user assigned to fabric client
@@ -153,6 +153,7 @@ exports.createUser = function (request, response) {
 		console.log('Send transaction promise and event listener promise have completed');
 		// check the results in the order the promises were added to the promise all list
 		if (results && results[0] && results[0].status === 'SUCCESS') {
+			console.log('results', results);
 			console.log('Successfully sent transaction to the orderer.');
 			response.end("{\"erro\":false,\"response\":\"ok\"}");
 		} else {

@@ -38,20 +38,20 @@ exports.queryInfo = function (request, response) {
 		fabric_client.setCryptoSuite(crypto_suite);
 
 		// get the enrolled user from persistence, this user will sign all requests
-		return fabric_client.getUserContext('DPOcli2', true);
+		return fabric_client.getUserContext('DPOcli1', true);
 	}).then((user_from_store) => {
 		if (user_from_store && user_from_store.isEnrolled()) {
-			console.log('Successfully loaded DPOcli2 from persistence');
+			console.log('Successfully loaded DPOcli1 from persistence');
 			member_user = user_from_store;
 		} else {
-			throw new Error('Failed to get DPOcli2.... run registerUser.js');
+			throw new Error('Failed to get DPOcli1.... run registerUser.js');
 		}
 
 		// queryCar chaincode function - requires 1 argument, ex: args: ['CAR4'],
 		// queryAllCars chaincode function - requires no arguments , ex: args: [''],
 		const request = {
 			//targets : --- letting this default to the peers assigned to the channel
-			chaincodeId: 'chaincode',
+			chaincodeId: 'dpoChaincode',
 			fcn: 'query',
 			args: [jsonKey]
 		};
@@ -65,16 +65,18 @@ exports.queryInfo = function (request, response) {
 			if (query_responses[0] instanceof Error) {
 				console.error("error from query = ", query_responses[0]);
 			} else {
-				console.log(query_responses);
+				console.log(query_responses[0]);
 				var transactionResponse = query_responses[0].toString();
-				transactionResponse = transactionResponse.replace("[\"", "[");
-				transactionResponse = transactionResponse.replace("}\"]", "}]");
+				transactionResponse = transactionResponse.replace("\"[", "[");
+				transactionResponse = transactionResponse.replace("]\"", "]");
+				transactionResponse = transactionResponse.replace("}\"", "}");
+				transactionResponse = transactionResponse.replace("\"{", "{")
 				transactionResponse = transactionResponse.replace(/\\/g, "");
 				transactionResponse = transactionResponse.replace(/]}}","{"header/g, "]}}, {\"header");
 				transactionResponse = transactionResponse.replace(/]}}","{"body/g, "]}}, {\"body");
 				transactionResponse = transactionResponse.replace(/]}}","{"transactionId/g, "]}}, {\"transactionId");
 				console.log("Response is ", transactionResponse);
-				response.end("{\"content\": " + transactionResponse + "}");
+				response.end(transactionResponse);
 
 			}
 		} else {

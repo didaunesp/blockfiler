@@ -48,7 +48,7 @@ Fabric_Client.newDefaultKeyValueStore({
             enrollmentID: 'admin',
             enrollmentSecret: 'adminpw'
         }).then((enrollment) => {
-            console.log('Successfully enrolled ' + user + ' user "' + user + '"');
+            console.log('Successfully enrolled admin user "' + user + '"');
             return fabric_client.createUser(
                 {
                     username: user,

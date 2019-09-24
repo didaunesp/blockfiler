@@ -38,13 +38,19 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 }
 
 func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+	//var err error
 
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
 
 	QueryAsBytes, _ := APIstub.GetState(args[0])
-	fmt.Printf("QueryAsBytes: %s", QueryAsBytes)
+	//PUTSTATE DE USER E TIMESTAMP
+	// err = stub.PutState(args[0], QueryAsBytes))
+	// if err != nil {
+	// 	return shim.Error(err.Error())
+	// }
+
 	return shim.Success(QueryAsBytes)
 }
 

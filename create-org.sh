@@ -86,7 +86,7 @@ docker exec cli.${ORGANIZATION3_NAME2} peer chaincode install -n chaincode -v 1.
 sleep 2
 
 #instantiate chaincode on peer 1
-docker exec cli.${ORGANIZATION_NAME2} peer chaincode instantiate -o orderer.${ORGANIZATION_NAME2}:7050 -C ${CHANNEL_NAME} -n chaincode -l golang -v 1.0 -c '{"Args":[]}' -P "OR('EmpresaMSP.member', 'CallAtivoMSP.member', 'CallPassivo.member')" 
+docker exec cli.${ORGANIZATION_NAME2} peer chaincode instantiate -o orderer.${ORGANIZATION_NAME2}:7050 -C ${CHANNEL_NAME} -n chaincode -l golang -v 1.0 -c '{"Args":[]}' -P "OR('EmpresaMSP.member', 'CallAtivoMSP.member', 'CallReativoMSP.member')" 
 
 #instantiate dpoChaincode on peer 1
-docker exec cli.${ORGANIZATION_NAME2} peer chaincode instantiate -o orderer.${ORGANIZATION_NAME2}:7050 -C ${CHANNEL_NAME} -n dpoChaincode -l golang -v 1.0 -c '{"Args":[]}' -P "OR('EmpresaMSP.member')" 
+docker exec cli.${ORGANIZATION_NAME2} peer chaincode instantiate -o orderer.${ORGANIZATION_NAME2}:7050 -C ${CHANNEL_NAME} -n dpoChaincode -l golang -v 1.0 -c '{"Args":[]}' -P "OR('EmpresaMSP.member', 'CallAtivoMSP.member', 'CallReativoMSP.member')" --collections-config  /opt/gopath/src/github.com/dpoChaincode/collections_config.json
