@@ -40,6 +40,8 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.create(APIstub, args)
 	} else if function == "query" {
 		return s.query(APIstub, args)
+	} else if function == "queryAll" {
+		return s.queryAll(APIstub, args)
 	} else if function == "history" {
 		return s.history(APIstub, args)
 	}
@@ -47,7 +49,7 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 	return shim.Error("Invalid Smart Contract function name.")
 }
 
-func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+func (s *SmartContract) queryAll(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
@@ -61,8 +63,8 @@ func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string
 
 	// Loop over structs and update user and time
 	for r := range registers {
-		registers[r].User = "user"
-		registers[r].Time = time.Now().String()
+		registers[r].User = "user2"
+		registers[r].Time = time.Now().Format("2006-01-02 15:04:05")
 		registerAsBytes, err := json.Marshal(registers[r])
 		if err != nil {
 			return shim.Error(err.Error())
@@ -71,6 +73,36 @@ func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string
 		if err2 != nil {
 			return shim.Error(err.Error())
 		}
+	}
+
+	return shim.Success(QueryAsBytes)
+}
+
+func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+
+	QueryAsBytes, _ := APIstub.GetState(args[0])
+
+	// Unmarshal string into structs.
+	var register Register
+	json.Unmarshal(QueryAsBytes, &register)
+
+	register.User = "user2"
+	register.Time = time.Now().Format("2006-01-02 15:04:05")
+	registerAsBytes, err := json.Marshal(register)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	err2 := APIstub.PutState(register.Key, registerAsBytes)
+	// var args2 []string
+	// args2[0] = register.Key
+	// args2[1] = register.Content
+	// s.create(APIstub, args2)
+	if err2 != nil {
+		return shim.Error(err.Error())
 	}
 
 	return shim.Success(QueryAsBytes)
@@ -142,7 +174,7 @@ func (s *SmartContract) create(APIstub shim.ChaincodeStubInterface, args []strin
 
 	// keyAsBytes, _ := json.Marshal(args[1])
 	// fmt.Println("contentAsBytes ", keyAsBytes)
-	register := &Register{key, content, "user", time.Now().String()}
+	register := &Register{key, content, "user", time.Now().Format("2006-01-02 15:04:05")}
 	registerAsBytes, err := json.Marshal(register)
 	if err != nil {
 		return shim.Error(err.Error())
