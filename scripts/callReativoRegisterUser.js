@@ -21,7 +21,7 @@ var fabric_ca_client = null;
 var admin_user = null;
 var member_user = null;
 var store_path = path.join(__dirname, './users');
-var user = "DPO"
+var user = "CallReativo"
 console.log(' Store path:' + store_path);
 
 // create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting

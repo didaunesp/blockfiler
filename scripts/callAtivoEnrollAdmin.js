@@ -12,7 +12,7 @@ var fabric_client = new Fabric_Client();
 var fabric_ca_client = null;
 var admin_user = null;
 var member_user = null;
-var user = "DPO"
+var user = "CallAtivo"
 var store_path = path.join(__dirname, './users');
 console.log(' Store path:' + store_path);
 
