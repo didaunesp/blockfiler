@@ -45,13 +45,13 @@ exports.createUser = function (request, response) {
 		fabric_client.setCryptoSuite(crypto_suite);
 
 		// get the enrolled user from persistence, this user will sign all requests
-		return fabric_client.getUserContext('nick2', true);
+		return fabric_client.getUserContext('DPOcli2', true);
 	}).then((user_from_store) => {
 		if (user_from_store && user_from_store.isEnrolled()) {
 			console.log('Successfully loaded use from persistence');
 			member_user = user_from_store;
 		} else {
-			throw new Error('Failed to get nick2.... run registerUser.js');
+			throw new Error('Failed to get DPOcli2.... run registerUser.js');
 		}
 		console.log("loaded config file");
 		// get a transaction id object based on the current user assigned to fabric client
