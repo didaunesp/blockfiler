@@ -58,22 +58,19 @@ func (s *SmartContract) getDpoKeys(APIstub shim.ChaincodeStubInterface, args []s
 }
 
 func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-	fmt.Println("entrou no query")
-	fmt.Println(args)
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
 
 	QueryAsBytes, _ := APIstub.GetState(args[0])
-
-	fmt.Println("QueryAsBytes")
-	fmt.Println(QueryAsBytes)
+	fmt.Println(string(QueryAsBytes))
 	var register Register
 	json.Unmarshal(QueryAsBytes, &register)
-	fmt.Println("register")
-	fmt.Println(register)
+
 	register.User = "user2"
 	register.Time = time.Now().Format("2006-01-02 15:04:05")
+	fmt.Println("register")
+	fmt.Println(register)
 	registerAsBytes, err := json.Marshal(register)
 	if err != nil {
 		return shim.Error(err.Error())
@@ -84,7 +81,7 @@ func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string
 	// args2[1] = register.Content
 	// s.create(APIstub, args2)
 	if err2 != nil {
-		return shim.Error(err.Error())
+		return shim.Error(err2.Error())
 	}
 	return shim.Success(QueryAsBytes)
 }
@@ -178,7 +175,7 @@ func (s *SmartContract) updateDpoList(APIstub shim.ChaincodeStubInterface, key s
 	}
 	keysString := string(keysBytes)
 	keys := keysString + key + "|"
-	err2 := APIstub.PutState(key, []byte(keys))
+	err2 := APIstub.PutState("DPO", []byte(keys))
 	if err2 != nil {
 		return shim.Error(err.Error())
 	}
