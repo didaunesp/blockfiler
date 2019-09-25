@@ -13,7 +13,7 @@
         "policy": "OR('EmpresaMSP.member', 'CallAtivoMSP.member')",
         "requiredPeerCount": 0,
         "maxPeerCount": 3,
-        "blockToLive":3,
+        "blockToLive":1000000,
         "memberOnlyRead": true
     },
   
@@ -22,7 +22,7 @@
          "policy": "OR('EmpresaMSP.member', 'CallReativoMSP.member')",
          "requiredPeerCount": 0,
          "maxPeerCount": 3,
-         "blockToLive":3,
+         "blockToLive":1000000,
          "memberOnlyRead": true
     },
 
@@ -31,7 +31,7 @@
           "policy": "OR('EmpresaMSP.member')",
           "requiredPeerCount": 0,
           "maxPeerCount": 3,
-          "blockToLive":3,
+          "blockToLive":1000000,
           "memberOnlyRead": true
      }
 
