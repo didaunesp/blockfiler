@@ -82,19 +82,9 @@ func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string
 	fmt.Println(string(QueryAsBytes))
 
 	if len(QueryAsBytes) > 0 {
-		var register Register
-		json.Unmarshal(QueryAsBytes, &register)
-		register.User = user
-		register.Time = time.Now().Format("2006-01-02 15:04:05")
-		fmt.Println("register")
-		fmt.Println(register)
-		registerAsBytes, err := json.Marshal(register)
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		err2 := APIstub.PutPrivateData(collection, key, registerAsBytes)
-		if err2 != nil {
-			return shim.Error(err2.Error())
+
+		if !s.updateRegister(APIstub, QueryAsBytes, user, collection, key) {
+			return shim.Error("erro ao atualizar registro")
 		}
 		// var args2 []string
 		// args2[0] = register.Key
@@ -103,6 +93,26 @@ func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string
 	}
 
 	return shim.Success(QueryAsBytes)
+}
+
+func (s *SmartContract) updateRegister(APIstub shim.ChaincodeStubInterface, QueryAsBytes []byte, user string, collection string, key string) bool {
+	var register Register
+	json.Unmarshal(QueryAsBytes, &register)
+	register.User = user
+	register.Time = time.Now().Format("2006-01-02 15:04:05")
+	fmt.Println("register")
+	fmt.Println(register)
+	registerAsBytes, err := json.Marshal(register)
+	if err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+	err2 := APIstub.PutPrivateData(collection, key, registerAsBytes)
+	if err2 != nil {
+		fmt.Println(err2.Error())
+		return false
+	}
+	return true
 }
 
 func (s *SmartContract) history(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
