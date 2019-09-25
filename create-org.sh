@@ -73,12 +73,8 @@ docker exec cli.${ORGANIZATION_NAME2} peer chaincode install -n chaincode -v 1.0
 #install dpoChaincode on peer 1
 docker exec cli.${ORGANIZATION_NAME2} peer chaincode install -n dpoChaincode -v 1.0 -p github.com/dpoChaincode -l golang
 
-sleep 2
-
 #install chaincode on peer 2
 docker exec cli.${ORGANIZATION2_NAME2} peer chaincode install -n chaincode -v 1.0 -p github.com/chaincode -l golang
-
-sleep 2
 
 #install chaincode on peer 3
 docker exec cli.${ORGANIZATION3_NAME2} peer chaincode install -n chaincode -v 1.0 -p github.com/chaincode -l golang
