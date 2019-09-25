@@ -22,6 +22,7 @@ exports.queryInfo = function (request, response) {
 	var tx_id = null;
 	console.log('REQUEST', request.body);
 	var jsonKey = request.body.key;
+	var user = request.body.user;
 	console.log("KEY ", jsonKey);
 
 	// create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
@@ -38,7 +39,7 @@ exports.queryInfo = function (request, response) {
 		fabric_client.setCryptoSuite(crypto_suite);
 
 		// get the enrolled user from persistence, this user will sign all requests
-		return fabric_client.getUserContext('CallReativocli1', true);
+		return fabric_client.getUserContext(user, true);
 	}).then((user_from_store) => {
 		if (user_from_store && user_from_store.isEnrolled()) {
 			console.log('Successfully loaded DPOcli1 from persistence');
@@ -53,7 +54,7 @@ exports.queryInfo = function (request, response) {
 			//targets : --- letting this default to the peers assigned to the channel
 			chaincodeId: 'dpoChaincode',
 			fcn: 'query',
-			args: [jsonKey]
+			args: [jsonKey, user]
 		};
 
 		// send the query proposal to the peer

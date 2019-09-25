@@ -28,6 +28,20 @@ exports.createUser = function (request, response) {
 	console.log(blockfiler);
 	var key = blockfiler.key.toString();
 	var content = blockfiler.content.toString();
+	var collection = '';
+
+	if(blockfiler.reactive && blockfiler.active){
+		collection = 'collectionPublico';
+	}
+	else if(blockfiler.reactive && !blockfiler.active){
+		collection = 'collectionReativo';
+	}
+	else if(!blockfiler.reactive && blockfiler.active){
+		collection = 'collectionAtivo';
+	}
+	else{
+		collection = 'collectionEmpresa'
+	}
 
 	console.log("parameters ", key, content)
 
@@ -67,7 +81,7 @@ exports.createUser = function (request, response) {
 			//targets: let default to the peer assigned to the client
 			chaincodeId: 'dpoChaincode',
 			fcn: 'create',
-			args: [key, content],
+			args: [key, content, collection],
 			chainId: 'mychannel',
 			txId: tx_id
 		};
