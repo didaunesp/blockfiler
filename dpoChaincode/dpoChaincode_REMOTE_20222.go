@@ -22,8 +22,6 @@ type SmartContract struct {
 type Register struct {
 	Key     string `json:"key"`
 	Content string `json:"content"`
-	User    string `json:"user"`
-	Time    string `json:"time"`
 }
 
 func (s *SmartContract) Init(APIstub shim.ChaincodeStubInterface) sc.Response {
@@ -42,77 +40,19 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.query(APIstub, args)
 	} else if function == "history" {
 		return s.history(APIstub, args)
-	} else if function == "getDpoKeys" {
-		return s.getDpoKeys(APIstub, args)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
 }
 
-func (s *SmartContract) getDpoKeys(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-	QueryAsBytes, err := APIstub.GetState("DPO")
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-	return shim.Success(QueryAsBytes)
-}
-
 func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-	if len(args) != 2 {
+
+	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
 
-	key := args[0]
-	user := args[1]
-
-	collection := "collectionPublico"
-	QueryAsBytes, _ := APIstub.GetPrivateData(collection, key)
-	if len(QueryAsBytes) == 0 {
-		collection = "collectionReativo"
-		QueryAsBytes, _ = APIstub.GetPrivateData(collection, key)
-		if len(QueryAsBytes) == 0 {
-			collection = "collectionAtivo"
-			QueryAsBytes, _ = APIstub.GetPrivateData(collection, key)
-			if len(QueryAsBytes) == 0 {
-				collection = "collectionEmpresa"
-				QueryAsBytes, _ = APIstub.GetPrivateData(collection, key)
-			}
-		}
-	}
-	fmt.Println(string(QueryAsBytes))
-
-	if len(QueryAsBytes) > 0 {
-
-		if !s.updateRegister(APIstub, QueryAsBytes, user, collection, key) {
-			return shim.Error("erro ao atualizar registro")
-		}
-		// var args2 []string
-		// args2[0] = register.Key
-		// args2[1] = register.Content
-		// s.create(APIstub, args2)
-	}
-
+	QueryAsBytes, _ := APIstub.GetState(args[0])
 	return shim.Success(QueryAsBytes)
-}
-
-func (s *SmartContract) updateRegister(APIstub shim.ChaincodeStubInterface, QueryAsBytes []byte, user string, collection string, key string) bool {
-	var register Register
-	json.Unmarshal(QueryAsBytes, &register)
-	register.User = user
-	register.Time = time.Now().Format("2006-01-02 15:04:05")
-	fmt.Println("register")
-	fmt.Println(register)
-	registerAsBytes, err := json.Marshal(register)
-	if err != nil {
-		fmt.Println(err.Error())
-		return false
-	}
-	err2 := APIstub.PutPrivateData(collection, key, registerAsBytes)
-	if err2 != nil {
-		fmt.Println(err2.Error())
-		return false
-	}
-	return true
 }
 
 func (s *SmartContract) history(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
@@ -173,13 +113,9 @@ func (s *SmartContract) history(APIstub shim.ChaincodeStubInterface, args []stri
 }
 
 func (s *SmartContract) create(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-	if len(args) != 3 {
-		return shim.Error("Incorrect number of arguments. Expecting 3")
-	}
-
 	var err error
 
-	fmt.Println("key ", args[0])
+	fmt.Println("content ", args[0])
 	var key = args[0]
 	
 	keyAsBytes, _ := json.Marshal(args[1])
@@ -190,29 +126,6 @@ func (s *SmartContract) create(APIstub shim.ChaincodeStubInterface, args []strin
 		return shim.Error(err.Error())
 	}
 
-	// err2 := APIstub.PutState(key, registerAsBytes)
-	// if err2 != nil {
-	// 	return shim.Error(err.Error())
-	// }
-	err2 := APIstub.PutPrivateData(collection, key, registerAsBytes)
-	if err2 != nil {
-		return shim.Error(err.Error())
-	}
-
-	return s.updateDpoList(APIstub, key)
-}
-
-func (s *SmartContract) updateDpoList(APIstub shim.ChaincodeStubInterface, key string) sc.Response {
-	keysBytes, err := APIstub.GetState("DPO")
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-	keysString := string(keysBytes)
-	keys := keysString + key + "|"
-	err2 := APIstub.PutState("DPO", []byte(keys))
-	if err2 != nil {
-		return shim.Error(err.Error())
-	}
 	return shim.Success(nil)
 }
 

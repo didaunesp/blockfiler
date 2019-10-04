@@ -181,11 +181,11 @@ func (s *SmartContract) create(APIstub shim.ChaincodeStubInterface, args []strin
 
 	fmt.Println("key ", args[0])
 	var key = args[0]
-	
-	keyAsBytes, _ := json.Marshal(args[1])
-	fmt.Println("keyAsBytes ", keyAsBytes)
+	var content = args[1]
+	var collection = args[2]
 
-	err = APIstub.PutState(key, keyAsBytes)
+	register := &Register{key, content, "DPOcli1", time.Now().Format("2006-01-02 15:04:05")}
+	registerAsBytes, err := json.Marshal(register)
 	if err != nil {
 		return shim.Error(err.Error())
 	}

@@ -66,7 +66,7 @@ exports.queryInfo = function (request, response) {
 			if (query_responses[0] instanceof Error) {
 				console.error("error from query = ", query_responses[0]);
 			} else {
-				console.log(query_responses[0]);
+				console.log()
 				var transactionResponse = query_responses[0].toString();
 				transactionResponse = transactionResponse.replace("\"[", "[");
 				transactionResponse = transactionResponse.replace("]\"", "]");
