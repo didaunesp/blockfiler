@@ -3,6 +3,8 @@ scripts/node_modules/*
 
 node-express/node_modules/*
 node-express/package-lock.json
+node-express/npm-debug.log
+node-express/
 
 scripts/package-lock.json
 empresa.com/*

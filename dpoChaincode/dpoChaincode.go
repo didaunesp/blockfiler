@@ -181,14 +181,12 @@ func (s *SmartContract) create(APIstub shim.ChaincodeStubInterface, args []strin
 
 	fmt.Println("key ", args[0])
 	var key = args[0]
-	
-	keyAsBytes, _ := json.Marshal(args[1])
-	fmt.Println("keyAsBytes ", keyAsBytes)
+	var content = args[1]
+	var collection = args[2]
 
-	err = APIstub.PutState(key, keyAsBytes)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
+	registerAsBytes, _ := json.Marshal(content)
+	fmt.Println("registerAsBytes ", registerAsBytes)
+
 
 	// err2 := APIstub.PutState(key, registerAsBytes)
 	// if err2 != nil {
