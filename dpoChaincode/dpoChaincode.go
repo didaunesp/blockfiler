@@ -112,6 +112,10 @@ func (s *SmartContract) updateRegister(APIstub shim.ChaincodeStubInterface, Quer
 		fmt.Println(err2.Error())
 		return false
 	}
+	fmt.Println("collection: " + key);
+	fmt.Println("key: " + key);
+	fmt.Println("registerAsBytes: " + key);
+	fmt.Println("register: " + json.stringfy(register));
 	return true
 }
 
