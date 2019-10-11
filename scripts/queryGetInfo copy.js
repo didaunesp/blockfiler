@@ -1,6 +1,6 @@
 'use strict';
 
-exports.queryHistory = function (request, response) {
+exports.queryInfo = function (request, response) {
 
 	var Fabric_Client = require('fabric-client');
 	var path = require('path');
@@ -20,8 +20,9 @@ exports.queryHistory = function (request, response) {
 	var store_path = path.join(__dirname, './users');
 	console.log('Store path:' + store_path);
 	var tx_id = null;
-
+	console.log('REQUEST', request.body);
 	var jsonKey = request.body.key;
+	var user = request.body.user;
 	console.log("KEY ", jsonKey);
 
 	// create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
@@ -38,7 +39,7 @@ exports.queryHistory = function (request, response) {
 		fabric_client.setCryptoSuite(crypto_suite);
 
 		// get the enrolled user from persistence, this user will sign all requests
-		return fabric_client.getUserContext('DPOcli1', true);
+		return fabric_client.getUserContext(user, true);
 	}).then((user_from_store) => {
 		if (user_from_store && user_from_store.isEnrolled()) {
 			console.log('Successfully loaded DPOcli1 from persistence');
@@ -51,9 +52,9 @@ exports.queryHistory = function (request, response) {
 		// queryAllCars chaincode function - requires no arguments , ex: args: [''],
 		const request = {
 			//targets : --- letting this default to the peers assigned to the channel
-			chaincodeId: 'chaincode',
-			fcn: 'history',
-			args: [jsonKey]
+			chaincodeId: 'dpoChaincode',
+			fcn: 'query',
+			args: [jsonKey, user]
 		};
 
 		// send the query proposal to the peer
@@ -65,15 +66,18 @@ exports.queryHistory = function (request, response) {
 			if (query_responses[0] instanceof Error) {
 				console.error("error from query = ", query_responses[0]);
 			} else {
+				console.log()
 				var transactionResponse = query_responses[0].toString();
-				transactionResponse = transactionResponse.replace("[\"", "[");
-				transactionResponse = transactionResponse.replace("}\"]", "}]");
+				transactionResponse = transactionResponse.replace("\"[", "[");
+				transactionResponse = transactionResponse.replace("]\"", "]");
+				transactionResponse = transactionResponse.replace("}\"", "}");
+				transactionResponse = transactionResponse.replace("\"{", "{")
 				transactionResponse = transactionResponse.replace(/\\/g, "");
 				transactionResponse = transactionResponse.replace(/]}}","{"header/g, "]}}, {\"header");
 				transactionResponse = transactionResponse.replace(/]}}","{"body/g, "]}}, {\"body");
 				transactionResponse = transactionResponse.replace(/]}}","{"transactionId/g, "]}}, {\"transactionId");
 				console.log("Response is ", transactionResponse);
-				response.end("{\"content\": " + transactionResponse + "}");
+				response.end(transactionResponse);
 
 			}
 		} else {

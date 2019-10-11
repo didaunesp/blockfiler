@@ -44,6 +44,8 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.history(APIstub, args)
 	} else if function == "getDpoKeys" {
 		return s.getDpoKeys(APIstub, args)
+	} else if function == "updateRegister" {
+		return s.updateRegister(APIstub, args)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
@@ -58,6 +60,40 @@ func (s *SmartContract) getDpoKeys(APIstub shim.ChaincodeStubInterface, args []s
 }
 
 func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+
+	key := args[0]
+
+	collection, QueryAsBytes, err := s.doQueryRegister(APIstub, key)
+	fmt.Println(collection)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(QueryAsBytes)
+}
+
+func (s *SmartContract) doQueryRegister(APIstub shim.ChaincodeStubInterface, key string) (string, []byte, error) {
+	collection := "collectionPublico"
+	QueryAsBytes, err := APIstub.GetPrivateData(collection, key)
+	if len(QueryAsBytes) == 0 {
+		collection = "collectionReativo"
+		QueryAsBytes, err = APIstub.GetPrivateData(collection, key)
+		if len(QueryAsBytes) == 0 {
+			collection = "collectionAtivo"
+			QueryAsBytes, err = APIstub.GetPrivateData(collection, key)
+			if len(QueryAsBytes) == 0 {
+				collection = "collectionEmpresa"
+				QueryAsBytes, err = APIstub.GetPrivateData(collection, key)
+			}
+		}
+	}
+	return collection, QueryAsBytes, err
+}
+
+func (s *SmartContract) updateRegister(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 	if len(args) != 2 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
@@ -65,58 +101,31 @@ func (s *SmartContract) query(APIstub shim.ChaincodeStubInterface, args []string
 	key := args[0]
 	user := args[1]
 
-	collection := "collectionPublico"
-	QueryAsBytes, _ := APIstub.GetPrivateData(collection, key)
-	if len(QueryAsBytes) == 0 {
-		collection = "collectionReativo"
-		QueryAsBytes, _ = APIstub.GetPrivateData(collection, key)
-		if len(QueryAsBytes) == 0 {
-			collection = "collectionAtivo"
-			QueryAsBytes, _ = APIstub.GetPrivateData(collection, key)
-			if len(QueryAsBytes) == 0 {
-				collection = "collectionEmpresa"
-				QueryAsBytes, _ = APIstub.GetPrivateData(collection, key)
-			}
-		}
+	collection, QueryAsBytes, err := s.doQueryRegister(APIstub, key)
+
+	if err != nil {
+		return shim.Error(err.Error())
 	}
-	fmt.Println(string(QueryAsBytes))
 
 	if len(QueryAsBytes) > 0 {
+		var register Register
+		json.Unmarshal(QueryAsBytes, &register)
+		register.User = user
+		register.Time = time.Now().Format("2006-01-02 15:04:05")
 
-		if !s.updateRegister(APIstub, QueryAsBytes, user, collection, key) {
-			return shim.Error("erro ao atualizar registro")
+		registerAsBytes, err2 := json.Marshal(register)
+		if err2 != nil {
+			return shim.Error(err2.Error())
 		}
-		// var args2 []string
-		// args2[0] = register.Key
-		// args2[1] = register.Content
-		// s.create(APIstub, args2)
+		err3 := APIstub.PutPrivateData(collection, key, registerAsBytes)
+		if err3 != nil {
+			return shim.Error(err3.Error())
+		}
+		fmt.Println("collection: " + collection)
+		fmt.Println("key: " + key)
+		fmt.Println("register: " + string(registerAsBytes))
 	}
-
-	return shim.Success(QueryAsBytes)
-}
-
-func (s *SmartContract) updateRegister(APIstub shim.ChaincodeStubInterface, QueryAsBytes []byte, user string, collection string, key string) bool {
-	var register Register
-	json.Unmarshal(QueryAsBytes, &register)
-	register.User = user
-	register.Time = time.Now().Format("2006-01-02 15:04:05")
-	fmt.Println("register")
-	fmt.Println(register)
-	registerAsBytes, err := json.Marshal(register)
-	if err != nil {
-		fmt.Println(err.Error())
-		return false
-	}
-	err2 := APIstub.PutPrivateData(collection, key, registerAsBytes)
-	if err2 != nil {
-		fmt.Println(err2.Error())
-		return false
-	}
-	fmt.Println("collection: " + key);
-	fmt.Println("key: " + key);
-	fmt.Println("registerAsBytes: " + key);
-	fmt.Println("register: " + json.stringfy(register));
-	return true
+	return shim.Success(nil)
 }
 
 func (s *SmartContract) history(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
@@ -181,24 +190,22 @@ func (s *SmartContract) create(APIstub shim.ChaincodeStubInterface, args []strin
 		return shim.Error("Incorrect number of arguments. Expecting 3")
 	}
 
-	var err error
-
 	fmt.Println("key ", args[0])
 	var key = args[0]
 	var content = args[1]
 	var collection = args[2]
 
-	registerAsBytes, _ := json.Marshal(content)
-	fmt.Println("registerAsBytes ", registerAsBytes)
+	register := &Register{key, content, "DPOcli1", time.Now().Format("2006-01-02 15:04:05")}
+	registerAsBytes, err := json.Marshal(register)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	fmt.Println("registerAsBytes ", string(registerAsBytes))
+	fmt.Println("collection", collection)
 
-
-	// err2 := APIstub.PutState(key, registerAsBytes)
-	// if err2 != nil {
-	// 	return shim.Error(err.Error())
-	// }
 	err2 := APIstub.PutPrivateData(collection, key, registerAsBytes)
 	if err2 != nil {
-		return shim.Error(err.Error())
+		return shim.Error(err2.Error())
 	}
 
 	return s.updateDpoList(APIstub, key)
