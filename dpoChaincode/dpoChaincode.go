@@ -26,6 +26,12 @@ type Register struct {
 	Time    string `json:"time"`
 }
 
+type RegisterPublic struct {
+	Key  string `json:"key"`
+	User string `json:"user"`
+	Time string `json:"time"`
+}
+
 func (s *SmartContract) Init(APIstub shim.ChaincodeStubInterface) sc.Response {
 	return shim.Success(nil)
 }
@@ -101,14 +107,14 @@ func (s *SmartContract) updateRegister(APIstub shim.ChaincodeStubInterface, args
 	key := args[0]
 	user := args[1]
 
-	collection, QueryAsBytes, err := s.doQueryRegister(APIstub, key)
+	QueryAsBytes, err := APIstub.GetState(key)
 
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 
 	if len(QueryAsBytes) > 0 {
-		var register Register
+		var register RegisterPublic
 		json.Unmarshal(QueryAsBytes, &register)
 		register.User = user
 		register.Time = time.Now().Format("2006-01-02 15:04:05")
@@ -117,11 +123,11 @@ func (s *SmartContract) updateRegister(APIstub shim.ChaincodeStubInterface, args
 		if err2 != nil {
 			return shim.Error(err2.Error())
 		}
-		err3 := APIstub.PutPrivateData(collection, key, registerAsBytes)
+		err3 := APIstub.PutState(key, registerAsBytes)
 		if err3 != nil {
 			return shim.Error(err3.Error())
 		}
-		fmt.Println("collection: " + collection)
+
 		fmt.Println("key: " + key)
 		fmt.Println("register: " + string(registerAsBytes))
 	}
@@ -134,17 +140,27 @@ func (s *SmartContract) history(APIstub shim.ChaincodeStubInterface, args []stri
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
 
-	resultsIterator, _ := APIstub.GetHistoryForKey(args[0])
+	resultsIterator, err := APIstub.GetHistoryForKey(args[0])
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	fmt.Println("args, results")
+	fmt.Println(args[0])
+	fmt.Println(resultsIterator)
 
 	resultsIterator.Close()
+	fmt.Println(resultsIterator)
 	var buffer bytes.Buffer
 	buffer.WriteString("[")
 
 	bArrayMemberAlreadyWritten := false
 	for resultsIterator.HasNext() {
-		response, err := resultsIterator.Next()
-		if err != nil {
-			return shim.Error(err.Error())
+		response, err2 := resultsIterator.Next()
+		fmt.Println("response")
+		fmt.Println(response)
+		if err2 != nil {
+			return shim.Error(err2.Error())
 		}
 		// Add a comma before array members, suppress it for the first array member
 		if bArrayMemberAlreadyWritten == true {
@@ -194,18 +210,31 @@ func (s *SmartContract) create(APIstub shim.ChaincodeStubInterface, args []strin
 	var key = args[0]
 	var content = args[1]
 	var collection = args[2]
+	var user = "DPOcli1"
 
-	register := &Register{key, content, "DPOcli1", time.Now().Format("2006-01-02 15:04:05")}
+	register := &Register{key, content, user, time.Now().Format("2006-01-02 15:04:05")}
+	registerPublic := &RegisterPublic{key, user, time.Now().Format("2006-01-02 15:04:05")}
 	registerAsBytes, err := json.Marshal(register)
+	registerPublicAsBytes, err := json.Marshal(registerPublic)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
+	registerPublicAsBytes, errPublic := json.Marshal(register)
+	if errPublic != nil {
+		return shim.Error(errPublic.Error())
+	}
+
 	fmt.Println("registerAsBytes ", string(registerAsBytes))
 	fmt.Println("collection", collection)
 
 	err2 := APIstub.PutPrivateData(collection, key, registerAsBytes)
 	if err2 != nil {
 		return shim.Error(err2.Error())
+	}
+
+	err2Public := APIstub.PutState(key, registerPublicAsBytes)
+	if err2Public != nil {
+		return shim.Error(err2Public.Error())
 	}
 
 	return s.updateDpoList(APIstub, key)
