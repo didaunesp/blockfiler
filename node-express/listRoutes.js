@@ -17,6 +17,8 @@ module.exports = function (app) {
 
     app.route('/images/favicon.ico').get(function (req, res) { res.sendFile(path + '/public/app/images/favicon.ico'); });
     app.route('/images/logo-blue.png').get(function (req, res) { res.sendFile(path + '/public/app/images/logo-blue.png'); });
+    app.route('/hist').get(function (req, res) { res.sendFile(path + '/public/hist.html'); });
+    app.route('/hist.js').get(function (req, res) { res.sendFile(path + '/public/hist.js'); });
     app.route('/reg').get(function (req, res) { res.sendFile(path + '/public/reg.html'); });
     app.route('/reg.js').get(function (req, res) { res.sendFile(path + '/public/reg.js'); });
     app.route('/dpo').get(function (req, res) { res.sendFile(path + '/public/dpo.html'); });
