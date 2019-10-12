@@ -66,6 +66,8 @@ exports.queryHistory = function (request, response) {
 				console.error("error from query = ", query_responses[0]);
 			} else {
 				var transactionResponse = query_responses[0].toString();
+				transactionResponse = transactionResponse.replace(":\"{", ":{");
+				transactionResponse = transactionResponse.replace("}\",", "},");
 				transactionResponse = transactionResponse.replace("[\"", "[");
 				transactionResponse = transactionResponse.replace("}\"]", "}]");
 				transactionResponse = transactionResponse.replace(/\\/g, "");
