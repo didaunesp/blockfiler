@@ -27,9 +27,10 @@ type Register struct {
 }
 
 type RegisterPublic struct {
-	Key  string `json:"key"`
-	User string `json:"user"`
-	Time string `json:"time"`
+	Key       string `json:"key"`
+	PublicKey string `json:"publicKey"`
+	User      string `json:"user"`
+	Time      string `json:"time"`
 }
 
 func (s *SmartContract) Init(APIstub shim.ChaincodeStubInterface) sc.Response {
@@ -52,6 +53,8 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.getDpoKeys(APIstub, args)
 	} else if function == "updateRegister" {
 		return s.updateRegister(APIstub, args)
+	} else if function == "getPublicKey" {
+		return s.getPublicKey(APIstub, args)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
@@ -201,25 +204,39 @@ func (s *SmartContract) history(APIstub shim.ChaincodeStubInterface, args []stri
 	return shim.Success(buffer.Bytes())
 }
 
+func (s *SmartContract) getPublicKey(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+
+	var key = args[0]
+
+	QueryAsBytes, err := APIstub.GetState(key)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	return shim.Success(QueryAsBytes)
+}
+
 func (s *SmartContract) create(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-	if len(args) != 3 {
-		return shim.Error("Incorrect number of arguments. Expecting 3")
+	if len(args) != 4 {
+		return shim.Error("Incorrect number of arguments. Expecting 4")
 	}
 
 	fmt.Println("key ", args[0])
 	var key = args[0]
-	var content = args[1]
-	var collection = args[2]
+	var publicKey = args[1]
+	var content = args[2]
+	var collection = args[3]
 	var user = "DPOcli1"
 
 	register := &Register{key, content, user, time.Now().Format("2006-01-02 15:04:05")}
-	registerPublic := &RegisterPublic{key, user, time.Now().Format("2006-01-02 15:04:05")}
+	registerPublic := &RegisterPublic{key, publicKey, user, time.Now().Format("2006-01-02 15:04:05")}
 	registerAsBytes, err := json.Marshal(register)
-	registerPublicAsBytes, err := json.Marshal(registerPublic)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	registerPublicAsBytes, errPublic := json.Marshal(register)
+	registerPublicAsBytes, errPublic := json.Marshal(registerPublic)
 	if errPublic != nil {
 		return shim.Error(errPublic.Error())
 	}

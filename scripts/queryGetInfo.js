@@ -6,6 +6,7 @@ exports.queryInfo = function (request, response) {
 	var path = require('path');
 	var util = require('util');
 	var os = require('os');
+	var jwt = require('jsonwebtoken');
 
 	//
 	var fabric_client = new Fabric_Client();
@@ -26,6 +27,7 @@ exports.queryInfo = function (request, response) {
 	console.log('REQUEST', request.body);
 	var jsonKey = request.body.key;
 	var user = request.body.user;
+	var token = request.body.token;
 	console.log("KEY ", jsonKey);
 
 	// create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
@@ -50,25 +52,59 @@ exports.queryInfo = function (request, response) {
 		} else {
 			throw new Error('Failed to get user.... run registerUser.js');
 		}
-
 		console.log("loaded config file");
-		// get a transaction id object based on the current user assigned to fabric client
-		tx_id = fabric_client.newTransactionID();
-		console.log("Assigning transaction_id: ", tx_id._transaction_id);
 
-		// queryCar chaincode function - requires 1 argument, ex: args: ['CAR4'],
-		// queryAllCars chaincode function - requires no arguments , ex: args: [''],
 		const request = {
 			//targets : --- letting this default to the peers assigned to the channel
 			chaincodeId: 'dpoChaincode',
-			fcn: 'updateRegister',
-			args: [jsonKey, user],
-			chainId: 'mychannel',
-			txId: tx_id
+			fcn: 'getPublicKey',
+			args: [jsonKey]
 		};
 
 		// send the query proposal to the peer
-		return channel.sendTransactionProposal(request);
+		return channel.queryByChaincode(request);
+	}).then((query_responses) => {
+		
+		console.log("Query has completed, checking results");
+		// query_responses could have more than one  results if there multiple peers were used as targets
+		if (query_responses && query_responses.length == 1) {
+			if (query_responses[0] instanceof Error) {
+				console.error("error from query = ", query_responses[0]);
+				throw new Error("error from query = ", query_responses[0]);
+			} else {
+				console.log("query response: " + query_responses);
+				var response = JSON.parse(query_responses);
+				console.log("response: " + response.publicKey);
+				console.log("PUBLIC KEY: " + response.publicKey);
+				console.log("token: " + token);
+				jwt.verify(token, response.publicKey, function(err, decoded) {
+					console.log(err, decoded)
+					if(err)
+					{
+						throw new Error("error on validating token= ", err);
+					}
+				  });
+				// get a transaction id object based on the current user assigned to fabric client
+				tx_id = fabric_client.newTransactionID();
+				console.log("Assigning transaction_id: ", tx_id._transaction_id);
+
+				// queryCar chaincode function - requires 1 argument, ex: args: ['CAR4'],
+				// queryAllCars chaincode function - requires no arguments , ex: args: [''],
+				const request = {
+					//targets : --- letting this default to the peers assigned to the channel
+					chaincodeId: 'dpoChaincode',
+					fcn: 'updateRegister',
+					args: [jsonKey, user],
+					chainId: 'mychannel',
+					txId: tx_id
+				};
+				// send the query proposal to the peer
+				return channel.sendTransactionProposal(request);
+			} 
+		} else {
+			console.error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
+			throw new Error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
+		}
 	}).then((results) => {
 		var proposalResponses = results[0];
 		var proposal = results[1];
@@ -189,6 +225,6 @@ exports.queryInfo = function (request, response) {
 			}
 		}).catch((err) => {
 		console.error('Failed to invoke successfully :: ' + err);
-		response.end("{\"erro\":true,\"response\":err}");
+		response.end("{\"erro\":true,\"response\":"+ err +"}");
 	});
 }

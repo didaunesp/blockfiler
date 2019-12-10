@@ -24,10 +24,10 @@ exports.createUser = function (request, response) {
 	console.log('Store path:' + store_path);
 	var tx_id = null;
 
-	var jsonPayload = request.body;
 	console.log(blockfiler);
 	var key = blockfiler.key.toString();
 	var content = blockfiler.content.toString();
+	var publicKey = blockfiler.publicKey.toString();
 	var collection = '';
 
 	if(blockfiler.reactive && blockfiler.active){
@@ -43,7 +43,7 @@ exports.createUser = function (request, response) {
 		collection = 'collectionEmpresa'
 	}
 
-	console.log("parameters ", key, content)
+	console.log("parameters ", key, content, publicKey);
 
 	// create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
 	Fabric_Client.newDefaultKeyValueStore({
@@ -75,13 +75,13 @@ exports.createUser = function (request, response) {
 		// createCar chaincode function - requires 5 args, ex: args: ['CAR12', 'Honda', 'Accord', 'Black', 'Tom'],
 		// changeCarOwner chaincode function - requires 2 args , ex: args: ['CAR10', 'Dave'],
 		// must send the proposal to endorsing peers
-		var filerTransaction = { jsonPayload };
+		var filerTransaction = { blockfiler };
 		console.log("FILER TRANSACTION ", JSON.stringify(filerTransaction));
 		var request = {
 			//targets: let default to the peer assigned to the client
 			chaincodeId: 'dpoChaincode',
 			fcn: 'create',
-			args: [key, content, collection],
+			args: [key, publicKey, content, collection],
 			chainId: 'mychannel',
 			txId: tx_id
 		};
