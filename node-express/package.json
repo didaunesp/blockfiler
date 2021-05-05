@@ -11,6 +11,7 @@
     "nodemon": "^1.18.1"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.16.3",
     "fabric-ca-client": "~1.4.0",
     "fabric-client": "^1.4.0",

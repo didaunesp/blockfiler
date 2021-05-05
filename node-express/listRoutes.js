@@ -1,5 +1,8 @@
 'use strict';
 var path = process.cwd();
+
+
+ 
 module.exports = function (app) {
     //path to the file with the function to call
     var createUser = require('../scripts/createUser');
@@ -7,7 +10,7 @@ module.exports = function (app) {
     var queryInfo = require('../scripts/queryGetInfo');
     var queryHistory = require('../scripts/queryGetHistory');
     var getDpoKeys = require('../scripts/getDpoKeys');
-
+    
     // Route the webservices
     app.route('/createUser').post(createUser.createUser);
     app.route('/queryDPO').post(queryDPO.queryDPO);
