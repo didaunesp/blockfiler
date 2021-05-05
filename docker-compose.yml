@@ -11,7 +11,7 @@ services:
     container_name: rca.${ORGANIZATION_NAME2}
     environment:
         - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.${COMPANY_DOMAIN}-cert.pem
-        - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/c1ef41d8f1f3279195ddad5fb11b6c4ce226ed9021478221204300d939b9b7a4_sk
+        - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/empresa-key.pem
     volumes:
         - ./${ORGANIZATION_NAME2}/:/etc/hyperledger/fabric-ca
         - ./${ORGANIZATION_NAME2}/server:/etc/hyperledger/fabric-ca-server
@@ -27,7 +27,7 @@ services:
     container_name: rca.${ORGANIZATION2_NAME2}
     environment:
         - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.${COMPANY2_DOMAIN}-cert.pem
-        - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/6d870bc2a4aff24d69b90cbac4bf140f1bd4fd04086f9212cecd8fcc5894bad5_sk
+        - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/callativo-key.pem
     volumes:
         - ./${ORGANIZATION2_NAME2}/:/etc/hyperledger/fabric-ca
         - ./${ORGANIZATION2_NAME2}/server:/etc/hyperledger/fabric-ca-server
@@ -43,7 +43,7 @@ services:
     container_name: rca.${ORGANIZATION3_NAME2}
     environment:
         - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.${COMPANY3_DOMAIN}-cert.pem
-        - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/0269bfd452f50b865b118266c9523dc2741ff4319582a1fcdbc80f39b4a921d8_sk
+        - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/callreativo-key.pem
     volumes:
         - ./${ORGANIZATION3_NAME2}/:/etc/hyperledger/fabric-ca
         - ./${ORGANIZATION3_NAME2}/server:/etc/hyperledger/fabric-ca-server
